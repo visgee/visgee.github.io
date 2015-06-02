@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第二章:用基本组件搭建Three.js场景(part 1) | 视觉极客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="概述在上一章中我们了解了Three.js库的基础知识，在本章中我们会稍微深入一下，详解组成场景的基础组件。本章主要内容如下
+
+搭建Three.js场景用到了哪些组件（components）
+我们能用THREE.Scene()对象做什么
+几何体（geometries）和网格（meshes）是怎样相关联的
+正交摄像机（orthographic camera）和透视投影摄像机（perspective c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第二章:用基本组件搭建Three.js场景(part 1)">
+<meta property="og:url" content="http://visgee.com/2015/02/05/c2/index.html">
+<meta property="og:site_name" content="视觉极客">
+<meta property="og:description" content="概述在上一章中我们了解了Three.js库的基础知识，在本章中我们会稍微深入一下，详解组成场景的基础组件。本章主要内容如下
+
+搭建Three.js场景用到了哪些组件（components）
+我们能用THREE.Scene()对象做什么
+几何体（geometries）和网格（meshes）是怎样相关联的
+正交摄像机（orthographic camera）和透视投影摄像机（perspective c">
+<meta property="og:image" content="http://ww2.sinaimg.cn/large/b29e5633tw1eoy5hf6tp1j20r20hydhh.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/large/b29e5633tw1eoyc0lk1g0j20k60dk0vg.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/large/b29e5633tw1eoybzuer52j20m00em7bg.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/large/b29e5633tw1eoyav44m82j20pe0h2ju0.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/large/b29e5633tw1eoyb8lfkx8j20po0hcq5h.jpg">
+<meta property="og:updated_time" content="2015-02-05T04:54:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第二章:用基本组件搭建Three.js场景(part 1)">
+<meta name="twitter:description" content="概述在上一章中我们了解了Three.js库的基础知识，在本章中我们会稍微深入一下，详解组成场景的基础组件。本章主要内容如下
+
+搭建Three.js场景用到了哪些组件（components）
+我们能用THREE.Scene()对象做什么
+几何体（geometries）和网格（meshes）是怎样相关联的
+正交摄像机（orthographic camera）和透视投影摄像机（perspective c">
+  
+    <link rel="alternative" href="/atom.xml" title="视觉极客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">视觉极客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">visual geek</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://visgee.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-c2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/02/05/c2/" class="article-date">
+  <time datetime="2015-02-05T03:42:16.000Z" itemprop="datePublished">2015-02-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Three-js/">Three.js</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第二章:用基本组件搭建Three.js场景(part 1)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="概述">概述</h3><p>在上一章中我们了解了Three.js库的基础知识，在本章中我们会稍微深入一下，详解组成场景的基础组件。本章主要内容如下</p>
+<ul>
+<li>搭建Three.js场景用到了哪些组件（components）</li>
+<li>我们能用THREE.Scene()对象做什么</li>
+<li>几何体（geometries）和网格（meshes）是怎样相关联的</li>
+<li>正交摄像机（orthographic camera）和透视投影摄像机（perspective camera）的区别是什么</li>
+</ul>
+<a id="more"></a>
+<h3 id="创建一个场景">创建一个场景</h3><p>在上一章中我们已经创建了一个<code>THREE.Scene()</code>对象，所以你应该已经知道要在场景中显示东西，有三种组件是必不可少的：</p>
+<ul>
+<li>camera （摄像机）：它决定了有哪些东西会被渲染</li>
+<li>lights（灯光）：能影响材质的显示效果，也能用来创建阴影效果</li>
+<li>objects（物体）：这是会被渲染到屏幕上的主要的部分，像立方体、球体等等</li>
+</ul>
+<p>看起来<code>THREE.Scene()</code>就像这些东西的容器，它本身没有什么功能和设置</p>
+<p>真的是这样吗？</p>
+<h3 id="场景（Scene）的基础功能">场景（Scene）的基础功能</h3><p>我们来通过例子来探索场景的功能。在第二章的源码中你能找到01-basic-scene.html</p>
+<p>我们将用这个例子来解释场景的很多功能和设置。当我们打开这个例子的时候，我们看到的会是这样的</p>
+<p><img src="http://ww2.sinaimg.cn/large/b29e5633tw1eoy5hf6tp1j20r20hydhh.jpg" alt=""></p>
+<p>这看起来和上一章的东西很相似，虽然这个场景目前空空如也，但它实际上已经包含了很多东西。通过看它的源码，能看到已经用<code>Scene.add(object)</code>函数添加了一个<code>THREE.Mesh</code>（就是你看到的这个平面），一个<code>THREE.SpotLight</code>点光源和<code>THREE.AmbientLight</code>环境光。</p>
+<p><code>THREE.Camera</code>摄像机对象在你渲染场景的时候被Three.js库自动添加上了，当然你也可以手动添加。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var scene = new THREE.Scene();&#10;var camera = new THREE.PerspectiveCamera(45,&#10;window.innerWidth / window.innerHeight, 0.1, 1000);&#10;...&#10;var planeGeometry = new THREE.PlaneGeometry(60,40,1,1);&#10;var planeMaterial = new THREE.MeshLambertMaterial(&#123;color: 0xffffff&#125;); var plane = new THREE.Mesh(planeGeometry,planeMaterial);&#10;...&#10;scene.add(plane);&#10;var ambientLight = new THREE.AmbientLight(0x0c0c0c); scene.add(ambientLight);&#10;...&#10;var spotLight = new THREE.SpotLight( 0xffffff );&#10;...&#10;scene.add( spotLight );</span><br></pre></td></tr></table></figure>
+<p>在我们深入学习场景对象之前，我要先解释一下在这个例子中你能做什么。在浏览器中打开示例，你会看到在右上角有个控制菜单。</p>
+<p><img src="http://ww2.sinaimg.cn/large/b29e5633tw1eoyc0lk1g0j20k60dk0vg.jpg" alt=""></p>
+<p>你能通过控制菜单向场景中添加一个立方体，或者删除刚加上的立方体。菜单还显示了场景中当前的物体数量。有件事你可能已经注意到了，你就是刚打开的时候尽管没有立方体，还是显示在场景有四个物体，它们分别是：</p>
+<ul>
+<li>平面（ground plane）</li>
+<li>环境光源(ambient light)</li>
+<li>点光源(spot light)</li>
+<li>摄像机(camera)</li>
+</ul>
+<p>接下来，我们来看看控制部分的各个函数，当然了，从最简单的<code>sddCube()</code>开始</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;this.addCube = function() &#123;&#10;     var cubeSize = Math.ceil((Math.random() * 3));&#10;     var cubeGeometry = new&#10;           THREE.CubeGeometry(cubeSize,cubeSize,cubeSize);&#10;     var cubeMaterial = new THREE.MeshLambertMaterial(&#10;&#123;color: Math.random() * 0xffffff &#125;);&#10;var cube = new THREE.Mesh(cubeGeometry, cubeMaterial); cube.castShadow = true;&#10;cube.name = &#34;cube-&#34; + scene.children.length; cube.position.x=-30 + Math.round(&#10;                (Math.random() * planeGeometry.width));&#10;     cube.position.y= Math.round((Math.random() * 5));&#10;     cube.position.z=-20 + Math.round((Math.random() *&#10;                 planeGeometry.height));&#10;     scene.add(cube);&#10;     this.numberOfObjects = scene.children.length;&#10;&#125;;</span><br></pre></td></tr></table></figure>
+<p>代码的意思一目了然，没有很多新的方面需要介绍。当你点击<code>sddCube</code>按钮，一个新的<code>THREE.CubeGeometry</code>实例会被创建，而且他的长宽高都是0-3之间的随机数。颜色和位置也都是随机产生的。<br>这段代码中的新内容是我们给每个立方体通过<code>name</code>属性赋予了一个名字，格式类似于cube-1，cube-2</p>
+<p>在查错和调试的时候名字能起到很大帮助，也能通过<code>Scene.getChildByName(name)</code>函数来选择场景中特定的个体，然后直接修改这个个体的属性。<br>你可能会问，最后一行代码是做什么呢？事实上<code>numberOfObjects</code>变量是我们的GUI控制器显示场景中物体/对象（objects）数量时用的。所以无论何时添加一个物体或者删除一个，这个数目都会及时得到更新。</p>
+<p>控制菜单调用的下一个函数是<code>removeCube</code>，它能从场景上移除刚刚添加的立方体。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.removeCube = function() &#123;&#10;       var allChildren = scene.children;&#10;       var lastObject = allChildren[allChildren.length-1];&#10;       if (lastObject instanceof THREE.Mesh) &#123;&#10;           scene.remove(lastObject);&#10;           this.numberOfObjects = scene.children.length;&#10;       &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>从场景中移除物体/对象用到的是<code>scene.remove()</code>函数。在上面代码中可以看到，我们先用<code>THREE.Scene</code>的<code>children</code>得到最后添加的对象，还检查了一下这个对象是不是<code>Mesh</code>网格对象。以防移除了摄像机或者光源。每次点击删除，都会更新物体数量。</p>
+<p>控制菜单最后一个按钮是<code>outputObjects</code>。你可能已经点击过它但是什么也没有发生。事实上它的作用是将现在场景中所有的物体/对象的信息输出到浏览器的控制台（console）中。就像下图中一样：<br><img src="http://ww4.sinaimg.cn/large/b29e5633tw1eoybzuer52j20m00em7bg.jpg" alt=""><br>输出信息搭配控制台的代码利用了内置<code>console</code>对象：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.outputObjects = function() &#123;&#10;       console.log(scene.children);&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>这对调试查错来说非常给力，尤其是当你给每个物体都命名了之后。你能轻松得到特定对象的信息，快速发现问题。比如你能把cube-17的信息陈列如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__webglActive: true&#10;__webglInit: true&#10;_modelViewMatrix: THREE.Matrix4&#10;_normalMatrix: THREE.Matrix3&#10;_vector: THREE.Vector3&#10;castShadow: true&#10;children: Array[0]&#10;eulerOrder: &#34;XYZ&#34;&#10;frustumCulled: true&#10;geometry: THREE.CubeGeometry&#10;id: 20&#10;material: THREE.MeshLambertMaterial&#10;matrix: THREE.Matrix4&#10;matrixAutoUpdate: true&#10;matrixRotationWorld: THREE.Matrix4&#10;matrixWorld: THREE.Matrix4&#10;matrixWorldNeedsUpdate: false&#10;name: &#34;cube-17&#34;&#10;parent: THREE.Scene&#10;position: THREE.Vector3&#10;properties: Object&#10;quaternion: THREE.Quaternion&#10;receiveShadow: false&#10;renderDepth: null&#10;rotation: THREE.Vector3&#10;rotationAutoUpdate: true&#10;scale: THREE.Vector3&#10;up: THREE.Vector3&#10;useQuaternion: false&#10;visible: true&#10;__proto__: Object</span><br></pre></td></tr></table></figure>
+<p>到此为止，我们已经认识了和场景相关的功能有：</p>
+<ul>
+<li><code>Scene.add()</code>：向场景添加对象</li>
+<li><code>Scene.remove()</code>：移除</li>
+<li><code>Scene.children()</code>：获得子对象列表</li>
+<li><code>Scene.getChildByName()</code>：通过name获得一个特定的对象</li>
+</ul>
+<p>这些都是非常重要的函数，经常会被用到。当然另外还有几个出现频率比较低的辅助函数，现在我们就以处理立方体角度的代码为例讲解。<br>在上一章中，我们用一个渲染循环来渲染场景，本例中也有同样的代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function render() &#123;&#10;     stats.update();&#10;       scene.traverse(function(e) &#123;&#10;         if (e instanceof THREE.Mesh &#38;&#38; e != plane ) &#123;&#10;           e.rotation.x+=controls.rotationSpeed;&#10;           e.rotation.y+=controls.rotationSpeed;&#10;           e.rotation.z+=controls.rotationSpeed;&#10;&#125; &#125;);&#10;requestAnimationFrame(render);&#10;renderer.render(scene, camera);&#10;   &#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们用到了<code>THREE.Scene.traverse()</code>函数。我们能传递一个函数作为<code>traverse()</code>的参数，而且传递给traverse的函数能被scene中所有的子对象调用。在<code>render()</code>函数中，我们将使用<code>traverse()</code>函数来更新每个立方体的角度（当然我们会特意不去修改平面（plane）），我们可以用一个for循环遍历scene所有子对象来做到这一点</p>
+<p>在我们深入学习网格（Mesh）和几何体（Geometry）前，我还要介绍场景（Scene）两个有趣的属性：</p>
+<ul>
+<li>fog</li>
+<li>overrideMaterial</li>
+</ul>
+<h3 id="给场景添加雾效（fog_effect）">给场景添加雾效（fog effect）</h3><p>fog属性能整个场景添加雾效，越远的物体看的越朦胧<br><img src="http://ww1.sinaimg.cn/large/b29e5633tw1eoyav44m82j20pe0h2ju0.jpg" alt=""><br>开启雾效很简单：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scene.fog=new THREE.Fog( 0xffffff, 0.015, 100 );</span><br></pre></td></tr></table></figure>
+<p>就这样，我们定义了一个白色的雾（0xffffff），最后两个参数是可用于调整雾的显示方式的远近属性（near property and far property）。<code>0.015,100</code>的意义就是在里摄像机距离为0.015时开始产生雾效（小于0.015不会产生），在离摄像机100及大于100的地方将会完全呈现雾效，原有物体都被雾遮掩。<br>还有一个不同的方式来设置的雾效：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scene.fog=new THREE.FogExp2( 0xffffff, 0.015 );</span><br></pre></td></tr></table></figure>
+<p>用这种方法不会有远近属性出现，只需要定义颜色和雾气密度（mist density）。</p>
+<h3 id="使用覆盖材质（overrideMaterial）属性">使用覆盖材质（overrideMaterial）属性</h3><p>我们介绍的场景（scene）的最后一个属性是<code>overrideMaterial</code>，他能修改所有物体的材质</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scene.overrideMaterial = new&#10;       THREE.MeshLambertMaterial(&#123;color: 0xffffff&#125;);</span><br></pre></td></tr></table></figure>
+<p>上面的代码就改变了所有物体的材质，现在整个场景看起来会是这个样子的：<br><img src="http://ww4.sinaimg.cn/large/b29e5633tw1eoyb8lfkx8j20po0hcq5h.jpg" alt=""></p>
+<p>我们给所有的物体使用了MeshLambertMaterial材质。用这种材质，您可以创建在光照效果下有反应但是不会闪亮的效果。在第4章，你会学到更多关于这种材料的知识。</p>
+<p>在本小节中，我们已经对Three.js的一个核心方面——场景（scene）——有了初步了解。关于场记有一点要牢记，那就是它是所有物体、光源、摄像机的容器。<br>下面是对场景（scene）最重功能和参数的总结：</p>
+<ul>
+<li><code>add(object)</code>：向场景中添加物体。你还能用这个函数创建物体组（接下来会有讲述）</li>
+<li><code>childern</code>：返回所有被添加到场景中物体的列表，包括光源（lights）和摄像机（camera）</li>
+<li><code>getChildByName(name)</code>：我们已经知道能通过<code>name</code>属性给物体命名。而利用场景（scene）的<code>getChildByName(name)</code>函数，能通过名称直接获取某个特定对象</li>
+<li><code>remove(object)</code>：移除场景中的物体</li>
+<li><code>traverse(function)</code>：<code>children</code>能返回场景所有子元素的列表，我们还可以用<code>traverse()</code>函数传递一个回调函数来获取这些子元素。</li>
+<li><code>fog</code>：这个属性能给场景添加雾效</li>
+<li><code>overrideMaterial</code>：强行给场景中的所有元素使用相同的材质</li>
+</ul>
+<p>在下一小节中我们的重点是添加到场景中的物体（objects）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://visgee.com/2015/02/05/c2/" data-id="ciafn1flz00002r0wnty87uyv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Three-js/">Three.js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/教程/">教程</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/03/04/image/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          image1
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/04/第一章/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第一章:用three.js创造你的第一个3D场景</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Three-js/">Three.js</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端/">前端</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂/">杂</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Three-js/">Three.js</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/图/">图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/教程/">教程</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Three-js/" style="font-size: 20px;">Three.js</a> <a href="/tags/js/" style="font-size: 15px;">js</a> <a href="/tags/图/" style="font-size: 10px;">图</a> <a href="/tags/教程/" style="font-size: 15px;">教程</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/02/">February 2015</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2015/06/03/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2015/03/04/image/">image1</a>
+          </li>
+        
+          <li>
+            <a href="/2015/02/05/c2/">第二章:用基本组件搭建Three.js场景(part 1)</a>
+          </li>
+        
+          <li>
+            <a href="/2015/02/04/第一章/">第一章:用three.js创造你的第一个3D场景</a>
+          </li>
+        
+          <li>
+            <a href="/2015/02/03/杂/">杂</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 visgee<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>
