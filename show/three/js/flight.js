@@ -1,5 +1,5 @@
-//$(document).ready(function(){
-//    console.log('ready')
+$(document).ready(function(){
+    console.log('ready')
 
     var scene, camera, renderer, controls, threejs;
     //var gui = null;
@@ -331,4 +331,4 @@
         renderer.render( scene, camera );
 
     }
-//});
+});

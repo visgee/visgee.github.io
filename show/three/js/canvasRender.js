@@ -463,7 +463,55 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				var amount = normal.dot( lightPosition );
 
-				if ( amount <= 0="" 1="" )="" continue;="" amount="" *="light.intensity;" color.add(="" _lightcolor.multiplyscalar(="" );="" }="" else="" if="" (="" light="" instanceof="" three.pointlight="" {="" var="" lightposition="_vector3.setFromMatrixPosition(" light.matrixworld="" _vector3.subvectors(="" lightposition,="" position="" ).normalize()="" <="0" =="0" ?="" :="" -="" math.min(="" position.distanceto(="" light.distance,="" function="" rendersprite(="" v1,="" element,="" material="" setopacity(="" material.opacity="" setblending(="" material.blending="" scalex="element.scale.x" _canvaswidthhalf;="" scaley="element.scale.y" _canvasheighthalf;="" dist="0.5" math.sqrt(="" +="" allow="" for="" rotated="" sprite="" _elembox.min.set(="" v1.x="" dist,="" v1.y="" _elembox.max.set(="" three.spritematerial="" texture="material.map;" !="=" null="" &&="" texture.image="" undefined="" texture.haseventlistener(="" 'update',="" ontextureupdate="" false="" texture.image.width=""> 0 ) {
+				if ( amount <= 0 ) continue;
+
+				amount *= light.intensity;
+
+				color.add( _lightColor.multiplyScalar( amount ) );
+
+			} else if ( light instanceof THREE.PointLight ) {
+
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
+
+				var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
+
+				if ( amount <= 0 ) continue;
+
+				amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
+
+				if ( amount == 0 ) continue;
+
+				amount *= light.intensity;
+
+				color.add( _lightColor.multiplyScalar( amount ) );
+
+			}
+
+		}
+
+	}
+
+	function renderSprite( v1, element, material ) {
+
+		setOpacity( material.opacity );
+		setBlending( material.blending );
+
+		var scaleX = element.scale.x * _canvasWidthHalf;
+		var scaleY = element.scale.y * _canvasHeightHalf;
+
+		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
+		_elemBox.min.set( v1.x - dist, v1.y - dist );
+		_elemBox.max.set( v1.x + dist, v1.y + dist );
+
+		if ( material instanceof THREE.SpriteMaterial ) {
+
+			var texture = material.map;
+
+			if ( texture !== null && texture.image !== undefined ) {
+
+				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+
+					if ( texture.image.width > 0 ) {
 
 						textureToPattern( texture );
 
@@ -1048,4 +1096,3 @@ THREE.CanvasRenderer = function ( parameters ) {
 	}
 
 };
-</=>

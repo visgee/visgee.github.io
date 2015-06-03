@@ -276,7 +276,13 @@ function distanceParticles(p1, p2) {
   var dist = p1.distanceTo(p2);
 
   var pos = p1.nearParticles.indexOf(p2);
-  if (dist <= distance)="" {="" if="" (pos="" <="" 0)="" p1.nearparticles.push(p2);="" createline(p1,="" p2);="" }="" else="">= 0) {
+  if (dist <= DISTANCE) {
+    if (pos < 0) {
+      p1.nearParticles.push(p2);
+      createLine(p1, p2);
+    }
+  } else {
+    if (pos >= 0) {
       p1.nearParticles.splice(pos, 1);
     }
   }
@@ -292,7 +298,13 @@ function distanceWithMouse(p) {
 
   var pos = mouse.particle.nearParticles.indexOf(p);
 
-  if (dist2D <= distance="" &&="" p_xy.z="" <="ZDEPTH)" {="" if="" (pos="" 0)="" mouse.particle.nearparticles.push(p);="" createmouseline(p);="" }="" else="">= 0) {
+  if (dist2D <= DISTANCE && p_xy.z <= ZDEPTH) {
+    if (pos < 0) {
+      mouse.particle.nearParticles.push(p);
+      createMouseLine(p);
+    }
+  } else {
+    if (pos >= 0) {
       mouse.particle.nearParticles.splice(pos, 1);
     }
   }
@@ -345,4 +357,3 @@ function toScreenXY(position) {
   return { x: ( pos.x + 1 ) * window.innerWidth / 2,
        y: ( - pos.y + 1) * window.innerHeight / 2, z: pos.z };
 }
-</=></=>
