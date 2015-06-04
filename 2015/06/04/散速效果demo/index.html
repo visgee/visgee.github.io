@@ -20,9 +20,9 @@
 
 
 
-	<meta name="keywords" content="express,node.js,socket.io," />
+	<meta name="keywords" content="canvas,p5.js," />
 
-  <title> express4+socket.io简例 // Visual geek </title>
+  <title> 散速效果demo // Visual geek </title>
 </head>
 
 <body>
@@ -120,7 +120,7 @@
           
           
             
-              express4+socket.io简例
+              散速效果demo
             
           
         </h1>
@@ -134,17 +134,6 @@
         </span>
 
         
-          
-            <span class="post-category">
-              &nbsp; | &nbsp; 分类于
-              
-                <a href="/categories/node-js/">node.js</a>
-
-                
-                
-
-              
-            </span>
           
         
 
@@ -161,10 +150,10 @@
         
 
         
-          <h3 id="简单的服务器端">简单的服务器端</h3><p>基于nodejs使用express4和socke.io</p>
-<a id="more"></a>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> request = <span class="built_in">require</span>(<span class="string">'request'</span>);</span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">var</span> bodyParser = <span class="built_in">require</span>(<span class="string">'body-parser'</span>);</span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>).Server(app);</span><br><span class="line"><span class="keyword">var</span> io = <span class="built_in">require</span>(<span class="string">'socket.io'</span>)(http);</span><br><span class="line"><span class="comment">//路径简单，直接在这里配置</span></span><br><span class="line"><span class="keyword">var</span> router = express.Router();</span><br><span class="line"><span class="comment">//配置端口</span></span><br><span class="line"><span class="keyword">var</span> port = process.env.PORT || <span class="number">3000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置网页文件目录</span></span><br><span class="line">app.set(<span class="string">'views'</span>,<span class="string">'./html'</span>);</span><br><span class="line"><span class="comment">//app.set('view engine','ejs');</span></span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended:<span class="literal">false</span>&#125;));</span><br><span class="line">app.use(bodyParser.json());</span><br><span class="line">app.use(express.static(path.join(__dirname,<span class="string">'html'</span>)));</span><br><span class="line"></span><br><span class="line"><span class="comment">//socket连接</span></span><br><span class="line">io.on( <span class="string">"connection"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"> socket </span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log( <span class="string">"一个新连接"</span> ); </span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">http.listen(port,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'正在监听3000端口'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">//配置api路径</span></span><br><span class="line"><span class="comment">//get请求示例:http://172.0.0.1:3000/c/page1</span></span><br><span class="line"></span><br><span class="line">app.use(<span class="string">'/c/'</span>, router);</span><br><span class="line">router.get(<span class="string">'/:pageIndex'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'get in'</span>);</span><br><span class="line">    <span class="keyword">var</span> pageIndex=req.params.pageIndex;</span><br><span class="line">    <span class="comment">//向展示端进行命令广播</span></span><br><span class="line">    io.sockets.emit(<span class="string">'change'</span>, &#123;pageIndex: pageIndex &#125;);</span><br><span class="line">    res.send(<span class="string">'OMG!!!Message Have Been Sent Successfully!!!'</span>)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>客户端（展示端）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> socket = io.connect(<span class="string">'http://localhost:3000'</span>);</span><br><span class="line">    socket.on(<span class="string">'change'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//get page Index from data</span></span><br><span class="line">    <span class="comment">//web page changes</span></span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
+          <p>非常有趣的效果</p>
+<h3 id="demo">demo</h3><p><a href="http://p5-effect-2-cd17a.coding.io/" target="_blank" rel="external">http://p5-effect-2-cd17a.coding.io/</a></p>
+<h3 id="代码">代码</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> s = [];</span><br><span class="line"><span class="keyword">var</span> positions = []</span><br><span class="line"><span class="keyword">var</span> step = [];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>;i&lt;<span class="number">2</span>;i++)&#123;</span><br><span class="line">	positions[i] = [];</span><br><span class="line">	step[i] = [];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> _width = <span class="built_in">window</span>.innerWidth;</span><br><span class="line"><span class="keyword">var</span> _height = <span class="built_in">window</span>.innerHeight;</span><br><span class="line"><span class="keyword">var</span> r = <span class="built_in">parseInt</span>(_height / <span class="number">100</span>);</span><br><span class="line"><span class="keyword">var</span> dis = r * <span class="number">8</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">preload</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">25</span>; i ++)&#123;</span><br><span class="line">		s[i] = <span class="built_in">Math</span>.random() * <span class="number">0.3</span> + <span class="number">0.15</span>;</span><br><span class="line">		<span class="keyword">var</span> pos = getPos(i);</span><br><span class="line">		<span class="comment">//console.log(pos);</span></span><br><span class="line">		positions[<span class="number">0</span>][i] = pos.x;</span><br><span class="line">		positions[<span class="number">1</span>][i] = pos.y;</span><br><span class="line">		step[<span class="number">0</span>][i] = -<span class="number">100</span>;</span><br><span class="line">		step[<span class="number">1</span>][i] = -<span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">console</span>.log(positions)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setup</span>(<span class="params"></span>)</span>&#123;	</span><br><span class="line">	createCanvas(_width,_height);</span><br><span class="line">	background(<span class="number">0</span>)</span><br><span class="line">	fill(<span class="number">255</span>);</span><br><span class="line">	noStroke();</span><br><span class="line">    frameRate(<span class="number">15</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	background(<span class="number">0</span>);</span><br><span class="line">	<span class="comment">//ellipse(500,350,10,10)</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">25</span>; i ++)&#123;</span><br><span class="line">		step[<span class="number">0</span>][i] = lerp(step[<span class="number">0</span>][i],positions[<span class="number">0</span>][i],s[i]);</span><br><span class="line">		step[<span class="number">1</span>][i] = lerp(step[<span class="number">1</span>][i],positions[<span class="number">1</span>][i],s[i]);</span><br><span class="line">		ellipse(step[<span class="number">0</span>][i],step[<span class="number">1</span>][i],r,r)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//console.log(step);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getPos</span>(<span class="params">index</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> _x = (index % <span class="number">5</span>) - <span class="number">2</span> ;</span><br><span class="line">	<span class="keyword">var</span> _y = <span class="built_in">parseInt</span>(index / <span class="number">5</span>) - <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">var</span> pos = &#123;</span><br><span class="line">		x:(_width / <span class="number">2</span>) + (dis * _x),</span><br><span class="line">		y:(_height / <span class="number">2</span>) + (dis * _y)</span><br><span class="line">	&#125;;</span><br><span class="line">	<span class="keyword">return</span> pos;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">replay</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">25</span>; i ++)&#123;</span><br><span class="line">		step[<span class="number">0</span>][i] = -<span class="number">100</span>;</span><br><span class="line">		step[<span class="number">1</span>][i] = -<span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> btn = <span class="built_in">document</span>.getElementById(<span class="string">"rpl"</span>);</span><br><span class="line">   btn.addEventListener(<span class="string">"click"</span>, replay);</span><br></pre></td></tr></table></figure>
+<h3 id="TIPS">TIPS</h3><p>lerp是P5提供的函数<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = lerp(<span class="number">0</span>,<span class="number">10</span>,<span class="number">0.5</span>)<span class="comment">//a=&gt;5</span></span><br><span class="line"></span><br><span class="line">a = lerp(<span class="number">1</span>,<span class="number">10</span>,<span class="number">0.5</span>)<span class="comment">//a=&gt;5.5</span></span><br><span class="line"></span><br><span class="line">a = lerp(<span class="number">2</span>,<span class="number">10</span>,<span class="number">0.5</span>)<span class="comment">//a=&gt;6</span></span><br></pre></td></tr></table></figure></p>
 
         
       </div>
@@ -175,16 +164,12 @@
         
           <div class="post-tags">
             
-              <a href="/tags/express/">
-                #express
+              <a href="/tags/canvas/">
+                #canvas
               </a>
             
-              <a href="/tags/node-js/">
-                #node.js
-              </a>
-            
-              <a href="/tags/socket-io/">
-                #socket.io
+              <a href="/tags/p5-js/">
+                #p5.js
               </a>
             
           </div>
@@ -194,13 +179,13 @@
           <div class="post-nav">
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2015/06/04/d3-js小记事本/">d3.js小记事本</a>
+                <a href="/2015/06/04/浏览器页面状态处理/">浏览器页面状态处理</a>
               
             </div>
 
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2015/06/04/绘制有12条边的立方体/">绘制有12条边的立方体</a>
+                <a href="/2015/06/04/粒子鼠标交互效果/">粒子鼠标交互效果</a>
               
             </div>
           </div>
@@ -309,7 +294,7 @@
         <div class="post-toc">
           
           
-            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单的服务器端"><span class="nav-number">1.</span> <span class="nav-text">简单的服务器端</span></a></li></ol></div>
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#demo"><span class="nav-number">1.</span> <span class="nav-text">demo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码"><span class="nav-number">2.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TIPS"><span class="nav-number">3.</span> <span class="nav-text">TIPS</span></a></li></ol></div>
           
         </div>
         <div class="post-toc-indicator-bottom post-toc-indicator"></div>

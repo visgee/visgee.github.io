@@ -1053,7 +1053,7 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #540959;
+  background: #ffba60;
 }
 .sidebar-nav {
   margin: 0;
@@ -2053,4 +2053,7 @@ hr {
   max-width: 100%;
   width: auto;
   margin: 0;
+}
+.sidebar-toggle {
+  top: 45px;
 }

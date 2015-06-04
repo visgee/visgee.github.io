@@ -20,9 +20,9 @@
 
 
 
-	<meta name="keywords" content="express,node.js,socket.io," />
+	<meta name="keywords" content="js,前端," />
 
-  <title> express4+socket.io简例 // Visual geek </title>
+  <title> 浏览器页面状态处理 // Visual geek </title>
 </head>
 
 <body>
@@ -120,7 +120,7 @@
           
           
             
-              express4+socket.io简例
+              浏览器页面状态处理
             
           
         </h1>
@@ -138,7 +138,7 @@
             <span class="post-category">
               &nbsp; | &nbsp; 分类于
               
-                <a href="/categories/node-js/">node.js</a>
+                <a href="/categories/前端/">前端</a>
 
                 
                 
@@ -161,10 +161,16 @@
         
 
         
-          <h3 id="简单的服务器端">简单的服务器端</h3><p>基于nodejs使用express4和socke.io</p>
-<a id="more"></a>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> request = <span class="built_in">require</span>(<span class="string">'request'</span>);</span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">var</span> bodyParser = <span class="built_in">require</span>(<span class="string">'body-parser'</span>);</span><br><span class="line"><span class="keyword">var</span> app = express();</span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>).Server(app);</span><br><span class="line"><span class="keyword">var</span> io = <span class="built_in">require</span>(<span class="string">'socket.io'</span>)(http);</span><br><span class="line"><span class="comment">//路径简单，直接在这里配置</span></span><br><span class="line"><span class="keyword">var</span> router = express.Router();</span><br><span class="line"><span class="comment">//配置端口</span></span><br><span class="line"><span class="keyword">var</span> port = process.env.PORT || <span class="number">3000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置网页文件目录</span></span><br><span class="line">app.set(<span class="string">'views'</span>,<span class="string">'./html'</span>);</span><br><span class="line"><span class="comment">//app.set('view engine','ejs');</span></span><br><span class="line">app.use(bodyParser.urlencoded(&#123;extended:<span class="literal">false</span>&#125;));</span><br><span class="line">app.use(bodyParser.json());</span><br><span class="line">app.use(express.static(path.join(__dirname,<span class="string">'html'</span>)));</span><br><span class="line"></span><br><span class="line"><span class="comment">//socket连接</span></span><br><span class="line">io.on( <span class="string">"connection"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"> socket </span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log( <span class="string">"一个新连接"</span> ); </span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">http.listen(port,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'正在监听3000端口'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">//配置api路径</span></span><br><span class="line"><span class="comment">//get请求示例:http://172.0.0.1:3000/c/page1</span></span><br><span class="line"></span><br><span class="line">app.use(<span class="string">'/c/'</span>, router);</span><br><span class="line">router.get(<span class="string">'/:pageIndex'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'get in'</span>);</span><br><span class="line">    <span class="keyword">var</span> pageIndex=req.params.pageIndex;</span><br><span class="line">    <span class="comment">//向展示端进行命令广播</span></span><br><span class="line">    io.sockets.emit(<span class="string">'change'</span>, &#123;pageIndex: pageIndex &#125;);</span><br><span class="line">    res.send(<span class="string">'OMG!!!Message Have Been Sent Successfully!!!'</span>)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>客户端（展示端）：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> socket = io.connect(<span class="string">'http://localhost:3000'</span>);</span><br><span class="line">    socket.on(<span class="string">'change'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">data</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//get page Index from data</span></span><br><span class="line">    <span class="comment">//web page changes</span></span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
+          <p>Since originally writing this answer, a new specification has reached recommendation status thanks to the W3C. The <code>Page Visibility API</code> (<a href="http://www.w3.org/TR/page-visibility/)now" target="_blank" rel="external">http://www.w3.org/TR/page-visibility/)now</a> allows us to more accurately detect when a page is hidden to the user.</p>
+<p>Current browser support:</p>
+<ul>
+<li>Chrome 13+</li>
+<li>Internet Explorer 10+</li>
+<li>Firefox 10+</li>
+<li>Opera 12.10+ [read notes]<br>The following code makes use of the API, falling back to the less reliable blur/focus method in incompatible browsers.</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> hidden = <span class="string">"hidden"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Standards:</span></span><br><span class="line">  <span class="keyword">if</span> (hidden <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"visibilitychange"</span>, onchange);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((hidden = <span class="string">"mozHidden"</span>) <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"mozvisibilitychange"</span>, onchange);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((hidden = <span class="string">"webkitHidden"</span>) <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"webkitvisibilitychange"</span>, onchange);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((hidden = <span class="string">"msHidden"</span>) <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"msvisibilitychange"</span>, onchange);</span><br><span class="line">  <span class="comment">// IE 9 and lower:</span></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"onfocusin"</span> <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.onfocusin = <span class="built_in">document</span>.onfocusout = onchange;</span><br><span class="line">  <span class="comment">// All others:</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">window</span>.onpageshow = <span class="built_in">window</span>.onpagehide</span><br><span class="line">    = <span class="built_in">window</span>.onfocus = <span class="built_in">window</span>.onblur = onchange;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">onchange</span> (<span class="params">evt</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> v = <span class="string">"visible"</span>, h = <span class="string">"hidden"</span>,</span><br><span class="line">        evtMap = &#123;</span><br><span class="line">          focus:v, focusin:v, pageshow:v, blur:h, focusout:h, pagehide:h</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    evt = evt || <span class="built_in">window</span>.event;</span><br><span class="line">    <span class="keyword">if</span> (evt.type <span class="keyword">in</span> evtMap)</span><br><span class="line">      <span class="built_in">document</span>.body.className = evtMap[evt.type];</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="built_in">document</span>.body.className = <span class="keyword">this</span>[hidden] ? <span class="string">"hidden"</span> : <span class="string">"visible"</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// set the initial state (but only if browser supports the Page Visibility API)</span></span><br><span class="line">  <span class="keyword">if</span>( <span class="built_in">document</span>[hidden] !== <span class="literal">undefined</span> )</span><br><span class="line">    onchange(&#123;type: <span class="built_in">document</span>[hidden] ? <span class="string">"blur"</span> : <span class="string">"focus"</span>&#125;);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<p>onfocusin and onfocusout are required for IE 9 and lower, while all others make use of onfocus and onblur, except for iOS, which uses onpageshow and onpagehide.</p>
 
         
       </div>
@@ -175,16 +181,12 @@
         
           <div class="post-tags">
             
-              <a href="/tags/express/">
-                #express
+              <a href="/tags/js/">
+                #js
               </a>
             
-              <a href="/tags/node-js/">
-                #node.js
-              </a>
-            
-              <a href="/tags/socket-io/">
-                #socket.io
+              <a href="/tags/前端/">
+                #前端
               </a>
             
           </div>
@@ -194,13 +196,11 @@
           <div class="post-nav">
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2015/06/04/d3-js小记事本/">d3.js小记事本</a>
-              
             </div>
 
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2015/06/04/绘制有12条边的立方体/">绘制有12条边的立方体</a>
+                <a href="/2015/06/04/散速效果demo/">散速效果demo</a>
               
             </div>
           </div>
@@ -309,7 +309,7 @@
         <div class="post-toc">
           
           
-            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单的服务器端"><span class="nav-number">1.</span> <span class="nav-text">简单的服务器端</span></a></li></ol></div>
+            <p class="post-toc-empty">此文章未包含目录</p>
           
         </div>
         <div class="post-toc-indicator-bottom post-toc-indicator"></div>

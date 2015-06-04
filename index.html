@@ -133,6 +133,294 @@
           
           
             
+              <a class="post-title-link" href="/2015/06/04/浏览器页面状态处理/">
+                浏览器页面状态处理
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-04
+          
+        </span>
+
+        
+          
+            <span class="post-category">
+              &nbsp; | &nbsp; 分类于
+              
+                <a href="/categories/前端/">前端</a>
+
+                
+                
+
+              
+            </span>
+          
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          
+            <p>Since originally writing this answer, a new specification has reached recommendation status thanks to the W3C. The <code>Page Visibility API</code> (<a href="http://www.w3.org/TR/page-visibility/)now" target="_blank" rel="external">http://www.w3.org/TR/page-visibility/)now</a> allows us to more accurately detect when a page is hidden to the user.</p>
+<p>Current browser support:</p>
+<ul>
+<li>Chrome 13+</li>
+<li>Internet Explorer 10+</li>
+<li>Firefox 10+</li>
+<li>Opera 12.10+ [read notes]<br>The following code makes use of the API, falling back to the less reliable blur/focus method in incompatible browsers.</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> hidden = <span class="string">"hidden"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Standards:</span></span><br><span class="line">  <span class="keyword">if</span> (hidden <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"visibilitychange"</span>, onchange);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((hidden = <span class="string">"mozHidden"</span>) <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"mozvisibilitychange"</span>, onchange);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((hidden = <span class="string">"webkitHidden"</span>) <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"webkitvisibilitychange"</span>, onchange);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((hidden = <span class="string">"msHidden"</span>) <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.addEventListener(<span class="string">"msvisibilitychange"</span>, onchange);</span><br><span class="line">  <span class="comment">// IE 9 and lower:</span></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"onfocusin"</span> <span class="keyword">in</span> <span class="built_in">document</span>)</span><br><span class="line">    <span class="built_in">document</span>.onfocusin = <span class="built_in">document</span>.onfocusout = onchange;</span><br><span class="line">  <span class="comment">// All others:</span></span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="built_in">window</span>.onpageshow = <span class="built_in">window</span>.onpagehide</span><br><span class="line">    = <span class="built_in">window</span>.onfocus = <span class="built_in">window</span>.onblur = onchange;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">onchange</span> (<span class="params">evt</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> v = <span class="string">"visible"</span>, h = <span class="string">"hidden"</span>,</span><br><span class="line">        evtMap = &#123;</span><br><span class="line">          focus:v, focusin:v, pageshow:v, blur:h, focusout:h, pagehide:h</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    evt = evt || <span class="built_in">window</span>.event;</span><br><span class="line">    <span class="keyword">if</span> (evt.type <span class="keyword">in</span> evtMap)</span><br><span class="line">      <span class="built_in">document</span>.body.className = evtMap[evt.type];</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="built_in">document</span>.body.className = <span class="keyword">this</span>[hidden] ? <span class="string">"hidden"</span> : <span class="string">"visible"</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// set the initial state (but only if browser supports the Page Visibility API)</span></span><br><span class="line">  <span class="keyword">if</span>( <span class="built_in">document</span>[hidden] !== <span class="literal">undefined</span> )</span><br><span class="line">    onchange(&#123;type: <span class="built_in">document</span>[hidden] ? <span class="string">"blur"</span> : <span class="string">"focus"</span>&#125;);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<p>onfocusin and onfocusout are required for IE 9 and lower, while all others make use of onfocus and onblur, except for iOS, which uses onpageshow and onpagehide.</p>
+
+          
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/js/">
+                #js
+              </a>
+            
+              <a href="/tags/前端/">
+                #前端
+              </a>
+            
+          </div>
+        
+
+        
+
+        
+        
+          <div class="post-eof"></div>
+        
+      </div>
+    
+  </div>
+
+
+  
+    
+
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/06/04/散速效果demo/">
+                散速效果demo
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-04
+          
+        </span>
+
+        
+          
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          
+            <p>非常有趣的效果</p>
+<h3 id="demo">demo</h3><p><a href="http://p5-effect-2-cd17a.coding.io/" target="_blank" rel="external">http://p5-effect-2-cd17a.coding.io/</a></p>
+<h3 id="代码">代码</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> s = [];</span><br><span class="line"><span class="keyword">var</span> positions = []</span><br><span class="line"><span class="keyword">var</span> step = [];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>;i&lt;<span class="number">2</span>;i++)&#123;</span><br><span class="line">	positions[i] = [];</span><br><span class="line">	step[i] = [];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> _width = <span class="built_in">window</span>.innerWidth;</span><br><span class="line"><span class="keyword">var</span> _height = <span class="built_in">window</span>.innerHeight;</span><br><span class="line"><span class="keyword">var</span> r = <span class="built_in">parseInt</span>(_height / <span class="number">100</span>);</span><br><span class="line"><span class="keyword">var</span> dis = r * <span class="number">8</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">preload</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">25</span>; i ++)&#123;</span><br><span class="line">		s[i] = <span class="built_in">Math</span>.random() * <span class="number">0.3</span> + <span class="number">0.15</span>;</span><br><span class="line">		<span class="keyword">var</span> pos = getPos(i);</span><br><span class="line">		<span class="comment">//console.log(pos);</span></span><br><span class="line">		positions[<span class="number">0</span>][i] = pos.x;</span><br><span class="line">		positions[<span class="number">1</span>][i] = pos.y;</span><br><span class="line">		step[<span class="number">0</span>][i] = -<span class="number">100</span>;</span><br><span class="line">		step[<span class="number">1</span>][i] = -<span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">console</span>.log(positions)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setup</span>(<span class="params"></span>)</span>&#123;	</span><br><span class="line">	createCanvas(_width,_height);</span><br><span class="line">	background(<span class="number">0</span>)</span><br><span class="line">	fill(<span class="number">255</span>);</span><br><span class="line">	noStroke();</span><br><span class="line">    frameRate(<span class="number">15</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	background(<span class="number">0</span>);</span><br><span class="line">	<span class="comment">//ellipse(500,350,10,10)</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">25</span>; i ++)&#123;</span><br><span class="line">		step[<span class="number">0</span>][i] = lerp(step[<span class="number">0</span>][i],positions[<span class="number">0</span>][i],s[i]);</span><br><span class="line">		step[<span class="number">1</span>][i] = lerp(step[<span class="number">1</span>][i],positions[<span class="number">1</span>][i],s[i]);</span><br><span class="line">		ellipse(step[<span class="number">0</span>][i],step[<span class="number">1</span>][i],r,r)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//console.log(step);</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getPos</span>(<span class="params">index</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> _x = (index % <span class="number">5</span>) - <span class="number">2</span> ;</span><br><span class="line">	<span class="keyword">var</span> _y = <span class="built_in">parseInt</span>(index / <span class="number">5</span>) - <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">var</span> pos = &#123;</span><br><span class="line">		x:(_width / <span class="number">2</span>) + (dis * _x),</span><br><span class="line">		y:(_height / <span class="number">2</span>) + (dis * _y)</span><br><span class="line">	&#125;;</span><br><span class="line">	<span class="keyword">return</span> pos;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">replay</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">25</span>; i ++)&#123;</span><br><span class="line">		step[<span class="number">0</span>][i] = -<span class="number">100</span>;</span><br><span class="line">		step[<span class="number">1</span>][i] = -<span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> btn = <span class="built_in">document</span>.getElementById(<span class="string">"rpl"</span>);</span><br><span class="line">   btn.addEventListener(<span class="string">"click"</span>, replay);</span><br></pre></td></tr></table></figure>
+<h3 id="TIPS">TIPS</h3><p>lerp是P5提供的函数<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = lerp(<span class="number">0</span>,<span class="number">10</span>,<span class="number">0.5</span>)<span class="comment">//a=&gt;5</span></span><br><span class="line"></span><br><span class="line">a = lerp(<span class="number">1</span>,<span class="number">10</span>,<span class="number">0.5</span>)<span class="comment">//a=&gt;5.5</span></span><br><span class="line"></span><br><span class="line">a = lerp(<span class="number">2</span>,<span class="number">10</span>,<span class="number">0.5</span>)<span class="comment">//a=&gt;6</span></span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/canvas/">
+                #canvas
+              </a>
+            
+              <a href="/tags/p5-js/">
+                #p5.js
+              </a>
+            
+          </div>
+        
+
+        
+
+        
+        
+          <div class="post-eof"></div>
+        
+      </div>
+    
+  </div>
+
+
+  
+    
+
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/06/04/粒子鼠标交互效果/">
+                粒子鼠标交互效果
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-06-04
+          
+        </span>
+
+        
+          
+            <span class="post-category">
+              &nbsp; | &nbsp; 分类于
+              
+                <a href="/categories/p5-js/">p5.js</a>
+
+                
+                
+
+              
+            </span>
+          
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          
+            <h3 id="codepen上原地址">codepen上原地址</h3><p><a href="http://codepen.io/DanielN/pen/eNzPjV" target="_blank" rel="external">http://codepen.io/DanielN/pen/eNzPjV</a></p>
+<p><img src="http://ww2.sinaimg.cn/large/0066rexxgw1esa1mhtrljj31580ng75a.jpg" alt=""></p>
+<h3 id="原代码（原生js）">原代码（原生js）</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// shim layer with setTimeout fallback</span></span><br><span class="line"><span class="built_in">window</span>.requestAnimFrame = (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">window</span>.requestAnimationFrame ||</span><br><span class="line">    <span class="built_in">window</span>.webkitRequestAnimationFrame ||</span><br><span class="line">    <span class="built_in">window</span>.mozRequestAnimationFrame ||</span><br><span class="line">    <span class="function"><span class="keyword">function</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">window</span>.setTimeout(callback, <span class="number">1000</span> / <span class="number">60</span>);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;)();</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'screen'</span>),</span><br><span class="line">  ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> sWidth = canvas.width = <span class="built_in">window</span>.innerWidth;</span><br><span class="line"><span class="keyword">var</span> sHeight = canvas.height = <span class="built_in">window</span>.innerHeight;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> mx = sWidth / <span class="number">2</span>,</span><br><span class="line">  my = sHeight / <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">document</span>.addEventListener(<span class="string">"mousemove"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">  mx = e.clientX;</span><br><span class="line">  my = e.clientY;</span><br><span class="line">&#125;, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vector</span>(<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.x = x || <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">this</span>.y = y || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.add = <span class="function"><span class="keyword">function</span>(<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.x += x || <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">this</span>.y += y || <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">this</span>.getDistance = <span class="function"><span class="keyword">function</span>(<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * x + y * y;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Particle</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.position = <span class="keyword">new</span> Vector(<span class="built_in">Math</span>.random() * sWidth, <span class="built_in">Math</span>.random() * sHeight);</span><br><span class="line">  <span class="keyword">this</span>.velocity = <span class="keyword">new</span> Vector(<span class="number">5</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">var</span> radius = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.x = <span class="built_in">Math</span>.random() * sWidth;</span><br><span class="line">  <span class="keyword">this</span>.y = <span class="built_in">Math</span>.random() * sHeight;</span><br><span class="line">  <span class="keyword">this</span>.vx = <span class="number">5</span>;</span><br><span class="line">  <span class="keyword">this</span>.vy = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">this</span>.dx = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">this</span>.dy = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.update = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.position.add(<span class="number">5</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.dx = mx - <span class="keyword">this</span>.position.x;</span><br><span class="line">    <span class="keyword">this</span>.dy = my - <span class="keyword">this</span>.position.y;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Math.atan2(a,b)返回正切值为（a/b）的角度，实际上就是鼠标与粒子之间直线与x轴的夹角。</span></span><br><span class="line">    <span class="keyword">this</span>.angle = <span class="built_in">Math</span>.atan2(<span class="keyword">this</span>.dy, <span class="keyword">this</span>.dx);</span><br><span class="line">		</span><br><span class="line">    <span class="comment">//根据夹角来修改瞬时速度，例如如果夹角为0，那么只做水平向的运动</span></span><br><span class="line">    <span class="keyword">this</span>.velocity.add(<span class="built_in">Math</span>.cos(<span class="keyword">this</span>.angle) * <span class="number">2</span>, <span class="built_in">Math</span>.sin(<span class="keyword">this</span>.angle));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置x，y方向瞬时速率最大值</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.velocity.x &gt; <span class="number">15</span>) <span class="keyword">this</span>.velocity.x = <span class="number">15</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.velocity.y &gt; <span class="number">15</span>) <span class="keyword">this</span>.velocity.y = <span class="number">15</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//根据瞬时速度进行位置修改</span></span><br><span class="line">    <span class="keyword">this</span>.position.add(<span class="keyword">this</span>.velocity.x, <span class="keyword">this</span>.velocity.y);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.draw = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    ctx.beginPath();</span><br><span class="line">    ctx.fillStyle = <span class="string">"white"</span>;</span><br><span class="line">    ctx.arc(<span class="keyword">this</span>.position.x, <span class="keyword">this</span>.position.y, radius, <span class="number">0</span>, <span class="number">2</span> * <span class="built_in">Math</span>.PI);</span><br><span class="line">    ctx.fill();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> particles = [];</span><br><span class="line"><span class="keyword">var</span> nParticles = <span class="number">500</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nParticles; i++) &#123;</span><br><span class="line">  particles[i] = <span class="keyword">new</span> Particle();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, sWidth, sHeight);</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nParticles; i++) &#123;</span><br><span class="line">    particles[i].update();</span><br><span class="line">    particles[i].draw();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span> <span class="title">program</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  requestAnimFrame(program);</span><br><span class="line">  render();</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<h3 id="p5-js版本">p5.js版本</h3><p>tips:</p>
+<ul>
+<li>省去用些写控制fps的部分</li>
+<li>使用p5的Vector</li>
+<li>使用p5捕获鼠标位置</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sWidth = <span class="built_in">window</span>.innerWidth;</span><br><span class="line"><span class="keyword">var</span> sHeight = <span class="built_in">window</span>.innerHeight;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> mx = sWidth / <span class="number">2</span>,</span><br><span class="line">  my = sHeight / <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> particles = [];</span><br><span class="line"><span class="keyword">var</span> nParticles = <span class="number">500</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nParticles; i++) &#123;</span><br><span class="line">  particles[i] = <span class="keyword">new</span> Particle();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Particle</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.position = <span class="keyword">new</span> p5.Vector(<span class="built_in">Math</span>.random() * sWidth, <span class="built_in">Math</span>.random() * sHeight);</span><br><span class="line">  <span class="keyword">this</span>.velocity = <span class="keyword">new</span> p5.Vector(<span class="number">5</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">var</span> radius = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.x = <span class="built_in">Math</span>.random() * sWidth;</span><br><span class="line">  <span class="keyword">this</span>.y = <span class="built_in">Math</span>.random() * sHeight;</span><br><span class="line">  <span class="keyword">this</span>.vx = <span class="number">5</span>;</span><br><span class="line">  <span class="keyword">this</span>.vy = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">this</span>.dx = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">this</span>.dy = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.update = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.position.add(<span class="number">5</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.dx = mx - <span class="keyword">this</span>.position.x;</span><br><span class="line">    <span class="keyword">this</span>.dy = my - <span class="keyword">this</span>.position.y;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Math.atan2(a,b)返回正切值为（a/b）的角度，实际上就是鼠标与粒子之间直线与x轴的夹角。</span></span><br><span class="line">    <span class="keyword">this</span>.angle = <span class="built_in">Math</span>.atan2(<span class="keyword">this</span>.dy, <span class="keyword">this</span>.dx);</span><br><span class="line">		</span><br><span class="line">    <span class="comment">//根据夹角来修改瞬时速度，例如如果夹角为0，那么只做水平向的运动</span></span><br><span class="line">    <span class="keyword">this</span>.velocity.add(<span class="built_in">Math</span>.cos(<span class="keyword">this</span>.angle) * <span class="number">2</span>, <span class="built_in">Math</span>.sin(<span class="keyword">this</span>.angle));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置x，y方向瞬时速率最大值</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.velocity.x &gt; <span class="number">15</span>) <span class="keyword">this</span>.velocity.x = <span class="number">15</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.velocity.y &gt; <span class="number">15</span>) <span class="keyword">this</span>.velocity.y = <span class="number">15</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//根据瞬时速度进行位置修改</span></span><br><span class="line">    <span class="keyword">this</span>.position.add(<span class="keyword">this</span>.velocity.x, <span class="keyword">this</span>.velocity.y);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.draw = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    ellipse(<span class="keyword">this</span>.position.x, <span class="keyword">this</span>.position.y,radius,radius);    </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setup</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	createCanvas(sWidth,sHeight);</span><br><span class="line">	background(<span class="number">0</span>);</span><br><span class="line">	fill(<span class="number">255</span>);</span><br><span class="line">	noStroke();</span><br><span class="line">	frameRate(<span class="number">50</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	mx = mouseX;</span><br><span class="line">	my = mouseY;</span><br><span class="line">	background(<span class="number">0</span>);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; nParticles; i++) &#123;</span><br><span class="line">	    particles[i].update();</span><br><span class="line">	    particles[i].draw();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后附上P5.Vector的api<br><a href="http://p5js.org/reference/#p5.Vector" target="_blank" rel="external">http://p5js.org/reference/#p5.Vector</a></p>
+
+          
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/canvas/">
+                #canvas
+              </a>
+            
+              <a href="/tags/p5-js/">
+                #p5.js
+              </a>
+            
+              <a href="/tags/交互/">
+                #交互
+              </a>
+            
+          </div>
+        
+
+        
+
+        
+        
+          <div class="post-eof"></div>
+        
+      </div>
+    
+  </div>
+
+
+  
+    
+
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
               <a class="post-title-link" href="/2015/06/04/p5-js小记事本/">
                 p5.js小记事本
               </a>
@@ -790,278 +1078,6 @@
 
 
   
-    
-
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2015/06/04/casper-js微博登陆demo/">
-                casper.js微博登陆demo
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2015-06-04
-          
-        </span>
-
-        
-          
-        
-
-        
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <h3 id="采用casper-js进行的微博登陆">采用casper.js进行的微博登陆</h3><p>可能由于微博更新而不可用</p>
-<p>但是用casper模拟人操纵浏览器行为进行登录的方法永远都行得通</p>
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2015/06/04/casper-js微博登陆demo/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/casper-js/">
-                #casper.js
-              </a>
-            
-              <a href="/tags/javascript/">
-                #javascript
-              </a>
-            
-              <a href="/tags/微博/">
-                #微博
-              </a>
-            
-              <a href="/tags/爬虫/">
-                #爬虫
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2015/06/04/casper-js小基础/">
-                casper.js小基础
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2015-06-04
-          
-        </span>
-
-        
-          
-        
-
-        
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <h1 id="casper-js读写文件">casper.js读写文件</h1><p>casperjs使用的是phantomjs的文件系统。</p>
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2015/06/04/casper-js小基础/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/casper-js/">
-                #casper.js
-              </a>
-            
-              <a href="/tags/javascript/">
-                #javascript
-              </a>
-            
-              <a href="/tags/爬虫/">
-                #爬虫
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
-    
-
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2015/03/04/image/">
-                那些我刷过的图
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          
-            发表于 2015-03-04
-          
-        </span>
-
-        
-          
-            <span class="post-category">
-              &nbsp; | &nbsp; 分类于
-              
-                <a href="/categories/生活边角料/">生活边角料</a>
-
-                
-                
-
-              
-            </span>
-          
-        
-
-        
-          
-        
-      </div>
-    </div>
-
-    
-      <div class="post-body">
-
-        
-        
-
-        
-          
-            <h1 id="动物园开会老虎没来为啥">动物园开会老虎没来为啥</h1>
-            <div class="post-more-link text-center">
-              <a class="btn" href="/2015/03/04/image/#more">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-        
-      </div>
-    
-
-    
-      <div class="post-footer">
-        
-          <div class="post-tags">
-            
-              <a href="/tags/图/">
-                #图
-              </a>
-            
-          </div>
-        
-
-        
-
-        
-        
-          <div class="post-eof"></div>
-        
-      </div>
-    
-  </div>
-
-
-  
 
           </div>
 
@@ -1095,11 +1111,11 @@
       <p class="site-description motion-element">❤️可视化专业户❤️</p>
       <div class="site-state motion-element">
         <div class="site-state-item site-state-posts">
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </div>
         <div class="site-state-item site-state-tags">
-            <span class="site-state-item-count">17</span>
+            <span class="site-state-item-count">19</span>
             <span class="site-state-item-name">标签</span>
         </div>
         <div class="site-state-item site-state-pages">
