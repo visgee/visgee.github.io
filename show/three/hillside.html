@@ -1,0 +1,642 @@
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Rhinoceros WebGL Viewer</title>
+    <style>
+        canvas { width: 100%; height: 100% }
+
+        body {margin: 0px;}
+
+        #container {
+            width: 100px;
+            height: 100px;
+            margin: 25% auto;
+            font-family: "arial";
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        #container > svg {
+            width: 100%;
+            display: block;
+        }
+
+        #footer {
+            clear: both;
+            height: 30px;
+            margin-top: -30px;
+            position: relative;
+            text-align: center;
+            font-size: small;
+            font-family: "arial";
+        }
+
+        #loader {
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            left:0; right:0;
+            top:0; bottom:0;
+            margin:auto;
+            max-width:100%;
+            max-height:100%;
+            overflow:auto;
+            z-index: 99999999999999;
+            display:none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="footer">Powered by <a href="http://www.food4rhino.com/project/iris?etx">Iris</a> for <a href="http://www.rhino3d.com/">Rhinoceros</a></div>
+
+<script type="text/javascript" src="./js/three.min.js"></script>
+<script type="text/javascript" src="./js/detect.js"></script>
+<script type="text/javascript" src="./js/progressBar.min.js"></script>
+<script type="text/javascript" src="./js/OrbitControls.js"></script>
+<script type="text/javascript" src="./js/helvetiker_bold.typeface.js"></script>
+<script type="text/javascript" src="./js/helvetiker_regular.typeface.js"></script>
+<script>
+var container;
+var camera, controls, scene, renderer;
+var cameras = [];
+var mouse;
+var t;
+
+detect();
+
+function detect(){
+
+    if (Detector.webgl) {
+
+        window.onload = function() {
+            init();
+            animate();
+        }
+
+    } else {
+        var warning = Detector.getWebGLErrorMessage();
+        document.getElementById('container').appendChild(warning);
+    }
+}
+
+function init() {
+
+    var contentElem = window.document.getElementById('content');
+    if(contentElem == null) //no UI mode
+    {
+        contentElem = document.createElement( 'div' );
+        contentElem.id = 'content';
+        document.body.insertBefore(contentElem, window.document.getElementById('footer'));
+    };
+
+//Progress Bar
+    var loaderElem = document.createElement( 'div' );
+    loaderElem.id = 'loader';
+    container = document.createElement( 'div' );
+    container.id = "container";
+    var circle = new ProgressBar.Circle(container, {
+        color: '#000000',
+        text: {
+            value: '0'
+        },
+        step: function(state, bar) {
+            bar.setText((bar.value() * 100).toFixed(0));
+        }
+    });
+
+
+    loaderElem.appendChild( container );
+    document.body.appendChild(loaderElem);
+    loaderElem.style.display = "block";
+
+//camera
+    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+    camera.position.z = 100;
+    camera.position.y = 100;
+
+    camera.up = new THREE.Vector3( 0, 0, 1 );
+    camera.lookAt(new THREE.Vector3(0, 0, 0 ));
+
+//controls
+    controls = new THREE.OrbitControls( camera );
+    controls.damping = 0.2;
+    controls.addEventListener( 'change', render );
+
+//scene
+    scene = new THREE.Scene();
+
+//load assets
+    var manager = new THREE.LoadingManager();
+    manager.onProgress = function ( item, loaded, total ) {
+
+        console.log( item, loaded, total );
+
+    };
+
+    var loader = new THREE.ObjectLoader(manager);
+
+    loader.load(
+            // resource URL coming from other file
+            'data/data.json',
+            // Function when resource is loaded
+            function ( result )
+            {
+                scene = result;
+                processScene(scene);
+
+            },
+            // Function called when download progresses
+            function ( xhr )
+            {
+                //console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+
+                if((xhr.loaded / xhr.total)<1)
+                {
+                    circle.set(xhr.loaded / xhr.total);
+                }
+
+                if((xhr.loaded / xhr.total)==1){
+                    circle.destroy();
+
+                    container.outerHTML = "";
+                    delete container;
+                    loaderElem.style.display = "none";
+
+                }
+            },
+            // Function called when download errors
+            function ( xhr )
+            { console.log( 'An error happened' ); }
+    );
+
+
+//render
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+    renderer.setSize( contentElem.clientWidth, window.innerHeight );
+
+    renderer.shadowMapEnabled = true;
+    renderer.shadowMapSoft = true;
+
+    /* renderer.shadowCameraNear = 3;
+     renderer.shadowCameraFar = camera.far;
+     renderer.shadowCameraFov = 50;
+
+     renderer.shadowMapBias = 0.0022;
+     renderer.shadowMapDarkness = 0.5;
+     renderer.shadowMapWidth = 2048;
+     renderer.shadowMapHeight = 2048; */
+
+    contentElem.appendChild(renderer.domElement);
+
+//events
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+
+    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener( 'layerOff', onLayerOff );
+    window.addEventListener( 'layerOn', onLayerOn );
+    window.addEventListener( 'viewChange', onViewChange );
+    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+    render();
+}
+
+
+function onDocumentMouseDown( event ) {
+
+    event.preventDefault();
+
+    mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+    mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+
+    raycaster.setFromCamera( mouse, camera );
+
+    var intersects = raycaster.intersectObject( scene.children[119] );
+
+    if ( intersects.length > 0 ) {
+        console.log(intersects[ 0 ]);
+        //intersects[ 0 ].face.color.setHex( Math.random() * 0xffffff );
+        //intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+
+        var age = intersects[ 0 ].point.x;
+        var yr = intersects[ 0 ].point.y;
+        var tx = intersects[ 0 ].point.z;
+
+        var ager =  Math.round(age);
+        var yrr =  Math.round(yr);
+        var txr =  Math.round(tx*10)/10;
+
+
+        console.log(age);
+        console.log(yr);
+        console.log(tx);
+
+        var bob = ager+'ans ' +'@'+yrr+ ': ' + txr+'%';
+        console.log(bob);
+        var spritey = makeTextSprite( bob,
+                { fontsize: 18, borderColor: {r:255, g:255, b:255, a:1.0}, backgroundColor: {r:255, g:255, b:255, a:1} } );
+
+        spritey.position.set(age, yr, tx);
+        console.log(spritey);
+
+
+        var geometry2 = new THREE.SphereGeometry( .25, 32, 32 );
+        var material2 = new  THREE.MeshBasicMaterial( {color: 0xff0000} );
+        var sphere = new THREE.Mesh( geometry2, material2 );
+        sphere.position.set(age, yr, tx);
+
+
+
+
+
+
+        console.log(t);
+        scene.remove(scene.children[t+3]);
+        scene.remove(scene.children[t+2]);
+
+        scene.add( spritey );
+        scene.add( sphere );
+        console.log(scene);
+
+
+
+    }
+}
+
+function makeTextSprite( message, parameters )
+{
+    if ( parameters === undefined ) parameters = {};
+
+    var fontface = parameters.hasOwnProperty("fontface") ?
+            parameters["fontface"] : "Arial";
+
+    var fontsize = parameters.hasOwnProperty("fontsize") ?
+            parameters["fontsize"] : 18;
+
+    var borderThickness = parameters.hasOwnProperty("borderThickness") ?
+            parameters["borderThickness"] : 4;
+
+    var borderColor = parameters.hasOwnProperty("borderColor") ?
+            parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+
+    var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
+            parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+
+    //var spriteAlignment = THREE.SpriteAlignment.topLeft;
+
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.font = "Bold " + fontsize + "px " + fontface;
+
+    // get size data (height depends only on font size)
+    var metrics = context.measureText( message );
+    console.log(metrics);
+    var textWidth = metrics.width;
+
+    // background color
+    context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+            + backgroundColor.b + "," + backgroundColor.a + ")";
+    // border color
+    context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
+            + borderColor.b + "," + borderColor.a + ")";
+
+    context.lineWidth = borderThickness;
+    roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 6);
+    // 1.4 is extra height factor for text below baseline: g,j,p,q.
+
+    // text color
+    context.fillStyle = "rgba(0, 0, 0, 1.0)";
+
+
+    context.fillText( message, borderThickness, fontsize + borderThickness);
+    console.log(context);
+    console.log(canvas);
+
+    // canvas contents will be used for a texture
+    var texture = new THREE.Texture(canvas)
+    texture.needsUpdate = true;
+
+    var spriteMaterial = new THREE.SpriteMaterial(
+            { map: texture /*,useScreenCoordinates: false, alignment: spriteAlignment */ }  );
+    var sprite = new THREE.Sprite( spriteMaterial );
+    sprite.scale.set(10,10,10);
+    return sprite;
+}
+
+// function for drawing rounded rectangles
+function roundRect(ctx, x, y, w, h, r)
+{
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);
+    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+}
+
+
+
+
+function processScene(scene)
+{
+    var g = new THREE.Geometry(); //for computing the scene BB
+    var pc = new THREE.PointCloud();
+    var pcId;
+    var pcAdd = false;
+    for(i = 0; i < scene.children.length; i++)
+    {
+        switch(scene.children[i].type)
+        {
+            case "Line":
+                var divID = scene.children[i].userData[0].Layer.split(' ').join('_');
+
+
+                if (!document.getElementById(divID)) {
+
+                    var data = {
+                        detail: {
+                            layer: scene.children[i].userData[0].Layer
+                        }
+                    }
+
+                    window.dispatchEvent( new CustomEvent( 'add-layer', data ) );
+                }
+                break;
+
+            case "PointCloud":
+
+                //scene.children[i].material.size = 5;
+                //scene.children[i].material.sizeAttenuation = false;
+
+                var divID = scene.children[i].userData[0].Layer.split(' ').join('_');
+
+
+                if (!document.getElementById(divID)) {
+
+                    var data = {
+                        detail: {
+                            layer: scene.children[i].userData[0].Layer
+                        }
+                    }
+
+                    window.dispatchEvent( new CustomEvent( 'add-layer', data ) );
+                }
+
+                break;
+
+            case "Mesh":
+
+                if(scene.children[i].geometry.type != "TextGeometry")
+                {
+                    scene.children[i].castShadow = true;
+                    scene.children[i].receiveShadow = true;
+                }
+
+                //scene.children[i].material.shading = 2;
+
+
+                g.merge(scene.children[i].geometry);
+                scene.children[i].material
+
+                //console.log(scene.children[i].userData[0].Layer);
+                var divID = scene.children[i].userData[0].Layer.split(' ').join('_');
+
+                if (!document.getElementById(divID)) {
+
+                    var data = {
+                        detail: {
+                            layer: scene.children[i].userData[0].Layer
+                        }
+                    }
+
+                    window.dispatchEvent( new CustomEvent( 'add-layer', data ) );
+                }
+
+                //var g = w2ui['grid'].records.length;
+                //w2ui['grid'].add( { recid: g + 1, fname: scene.children[i].userData[0].Layer} );
+
+                break;
+
+            case "DirectionalLight":
+
+                scene.children[i].castShadow = true;
+                //scene.children[i].shadowCameraVisible = true;
+
+                scene.children[i].shadowMapWidth = 2048;
+                scene.children[i].shadowMapHeight = 2048;
+
+                g.computeBoundingSphere();
+
+                var d = g.boundingSphere.radius * 2;
+
+                scene.children[i].shadowCameraLeft = -d;
+                scene.children[i].shadowCameraRight = d;
+                scene.children[i].shadowCameraTop = d;
+                scene.children[i].shadowCameraBottom = -d;
+
+                scene.children[i].shadowCameraNear = 10;
+                scene.children[i].shadowCameraFar = d*10;
+                scene.children[i].shadowDarkness = 0.2;
+                scene.children[i].shadowDarkness = 0.5;
+                scene.children[i].shadowBias = -0.00001;
+
+                break;
+
+            case "SpotLight":
+                scene.children[i].castShadow = true;
+                //also need to add spotlight parameters
+
+                break;
+
+            case "PerspectiveCamera":
+
+                var cam = new THREE.PerspectiveCamera( scene.children[i].fov, scene.children[i].aspect, scene.children[i].near, scene.children[i].far);
+                cam.up = new THREE.Vector3( 0, 0, 1 );
+                cam.name = scene.children[i].name;
+                cam.userData = scene.children[i].userData;
+
+                //console.log(cam);
+                cameras.push(cam);
+
+                camera = scene.children[i];
+                camera.up = new THREE.Vector3( 0, 0, 1 );
+
+                controls = new THREE.OrbitControls( camera );
+                controls.target = new THREE.Vector3( scene.children[i].userData[0].tX, scene.children[i].userData[0].tY, scene.children[i].userData[0].tZ );
+
+
+                //add to views
+
+                var divID = scene.children[i].name.split(' ').join('_');
+                //console.log("Perspective View? " + divID);
+                if (!document.getElementById(divID)) {
+
+                    var data = {
+                        detail: {
+                            viewName: scene.children[i].name,
+                            viewID: divID
+                        }
+                    }
+
+                    window.dispatchEvent( new CustomEvent( 'add-view', data ) );
+                }
+
+                break;
+
+            default:
+                //console.log("not sure!");
+                break;
+        }
+
+        t = scene.children.length -1;
+    }
+
+
+    var normat = new THREE.MeshNormalMaterial({
+
+        //transparent: true
+    });
+
+    normat.opacity = .95;
+//normat.wireframe = true;
+    normat.transparent = true;
+
+    scene.children[119].material = normat ;
+
+
+    for (var item in scene.children) {
+        console.log(item);
+        if (item !=119){
+            //scene.children[item].material.linewidth = .1;
+            scene.children[item].material.transparent = true;
+            scene.children[item].material.opacity = .5;
+        }
+    }
+
+
+
+
+
+    if(pcAdd)
+    {
+        scene.add(pc);
+        scene.remove(scene.children[pcId]);
+    }
+
+    var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+    scene.add( light );
+
+    console.log(scene);
+
+}
+
+function onWindowResize() {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    render();
+}
+
+function onLayerOff(event)
+{
+    for(var i = 0; i < scene.children.length; i++)
+    {
+        if(scene.children[i].type == "Mesh" || scene.children[i].type == "PointCloud" || scene.children[i].type == "Line" )
+        {
+            if(event.detail.layer == scene.children[i].userData[0].Layer)
+            {
+                scene.children[i].visible = false;
+            }
+        }
+    }
+
+}
+
+function onLayerOn(event)
+{
+    for(var i = 0; i < scene.children.length; i++)
+    {
+        if(scene.children[i].type == "Mesh" || scene.children[i].type == "PointCloud" || scene.children[i].type == "Line")
+        {
+            if(event.detail.layer == scene.children[i].userData[0].Layer)
+            {
+                scene.children[i].visible = true;
+            }
+        }
+    }
+
+}
+
+function onViewChange(event)
+{
+    var cam = scene.getObjectByName( event.detail.view );
+
+    /* for(var i = 0; i < cameras.length; i++)
+     {
+     if(cameras[i].name == event.detail.view)
+     {
+     console.log('yes camera');
+
+     camera = cameras[i];
+     camera.up = new THREE.Vector3( 0, 0, 1 );
+
+     controls = new THREE.OrbitControls( camera );
+     controls.target = new THREE.Vector3( camera.userData[0].tX, camera.userData[0].tY, camera.userData[0].tZ );
+
+     }
+     } */
+
+    camera = cam;
+    camera.up = new THREE.Vector3( 0, 0, 1 );
+
+    controls = new THREE.OrbitControls( camera );
+    controls.target = new THREE.Vector3( camera.userData[0].tX, camera.userData[0].tY, camera.userData[0].tZ );
+
+    //console.log(cam);
+
+
+}
+
+
+function animate() {
+
+    requestAnimationFrame( animate );
+    controls.update();
+    render();
+}
+
+function render() {
+
+    renderer.render( scene, camera );
+
+}
+
+
+</script>
+<script>
+
+    window.onbeforeunload = function () {
+        ping = new XMLHttpRequest();
+        ping.open("GET", "shutdown", true);
+        ping.send();
+    };
+
+</script>
+
+</body>
+</html>
