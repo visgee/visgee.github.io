@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>china food</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background: rgb(29,34,40);
+        }
+    </style>
+    <script type="x-shader/x-vertex" id="vertexshader">
+            attribute float size;
+            attribute vec3 customColor;
+
+            varying vec3 vColor;
+
+            void main() {
+                vColor = customColor;
+                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+                gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        </script>
+    <script type="x-shader/x-fragment" id="fragmentshader">
+            uniform vec3 color;
+            uniform sampler2D texture;
+
+            varying vec3 vColor;
+
+            void main() {
+                gl_FragColor = vec4( color * vColor, 0.5 );
+                gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+            }
+        </script>
+</head>
+<body>
+
+<div id="container"></div>
+<script src="./js/detect.js"></script>
+<script src="./js/jquery.js"></script>
+<script src="./js/three.js"></script>
+<script src="./js/trackball.js"></script>
+<script src="./js/dat.js"></script>
+<script src="./js/stats.js"></script>
+<script src="./data/candy.js"></script>
+<script src="./js/chinaMap.js"></script>
+</body>
+</html>
