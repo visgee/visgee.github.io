@@ -20,9 +20,9 @@
 
 
 
-	<meta name="keywords" content="casper.js,javascript,微博,爬虫," />
+	<meta name="keywords" content="LowDB,node.js,静态数据库," />
 
-  <title> casper.js微博登陆demo // Visual geek </title>
+  <title> LowDB中文翻译 // Visual geek </title>
 </head>
 
 <body>
@@ -120,7 +120,7 @@
           
           
             
-              casper.js微博登陆demo
+              LowDB中文翻译
             
           
         </h1>
@@ -129,7 +129,7 @@
       <div class="post-meta">
         <span class="post-time">
           
-            发表于 2015-06-04
+            发表于 2015-07-09
           
         </span>
 
@@ -161,10 +161,94 @@
         
 
         
-          <h3 id="采用casper-js进行的微博登陆">采用casper.js进行的微博登陆</h3><p>可能由于微博更新而不可用</p>
-<p>但是用casper模拟人操纵浏览器行为进行登录的方法永远都行得通</p>
+          <h1 id="LowDB">LowDB <a href="http://badge.fury.io/js/lowdb" target="_blank" rel="external"><img src="https://badge.fury.io/js/lowdb.svg" alt="NPM version"></a> <a href="https://travis-ci.org/typicode/lowdb" target="_blank" rel="external"><img src="https://travis-ci.org/typicode/lowdb.svg?branch=master" alt="Build Status"></a></h1><blockquote>
+<p>Need a quick way to get a local database?</p>
+<p>需要一种神速的本地存储方式吗？</p>
+</blockquote>
+<p>LowDB是基于node的纯JSON文件数据库，这是它readMe文件的中文翻译。</p>
 <a id="more"></a>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> url = <span class="string">'http://weibo.com/login.php'</span>;</span><br><span class="line"><span class="keyword">var</span> config = &#123;</span><br><span class="line">	username:<span class="string">'###'</span>,</span><br><span class="line">	password:<span class="string">'###'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> casper = <span class="built_in">require</span>(<span class="string">'casper'</span>).create(&#123;</span><br><span class="line">	verbose:<span class="literal">true</span>,</span><br><span class="line">	logLevel:<span class="string">'debug'</span>,</span><br><span class="line">	pageSettings:&#123;</span><br><span class="line">		loadImages:<span class="literal">false</span>,</span><br><span class="line">		loadPlugins:<span class="literal">false</span>,</span><br><span class="line">		userAgent:<span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4'</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">casper.start(url,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="keyword">this</span>.exists(<span class="string">'.ficon_face'</span>))</span><br><span class="line">	<span class="keyword">this</span>.wait(<span class="number">3000</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(!(<span class="keyword">this</span>.exists(<span class="string">'.ficon_face'</span>)))&#123;</span><br><span class="line">			<span class="keyword">this</span>.capture(<span class="string">'weiboLogin0'</span>+ <span class="string">'.png'</span>);</span><br><span class="line">			<span class="built_in">console</span>.log(<span class="string">'尚未登录'</span>)</span><br><span class="line">		    <span class="keyword">this</span>.sendKeys(<span class="string">'div.username input'</span>,config.username)</span><br><span class="line">	        <span class="keyword">this</span>.sendKeys(<span class="string">'div.password input'</span>,config.password,&#123;keepFocus: <span class="literal">true</span>&#125;);</span><br><span class="line">	        <span class="keyword">this</span>.sendKeys(<span class="string">'div.password input'</span>, casper.page.event.key.Enter , &#123;keepFocus: <span class="literal">true</span>&#125;);</span><br><span class="line">	        <span class="keyword">this</span>.waitForSelector(<span class="string">'.ficon_face'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	        	<span class="built_in">console</span>.log(<span class="string">'微博登陆成功'</span>);</span><br><span class="line">	        	<span class="keyword">this</span>.capture(<span class="string">'weiboLogin1'</span>+ <span class="string">'.png'</span>);</span><br><span class="line">	        &#125;,<span class="number">10000</span>)</span><br><span class="line">	    &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br><span class="line">casper.then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> nickName = <span class="keyword">this</span>.getHTML(<span class="string">'.gn_nav .gn_name .S_txt1'</span>);</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">'当前登录用户昵称：'</span> + nickName);</span><br><span class="line">	<span class="keyword">this</span>.open(<span class="string">'http://s.weibo.com/'</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.wait(<span class="number">3000</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.capture(<span class="string">'search.png'</span>);</span><br><span class="line">        &#125;)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;)</span><br><span class="line">casper.run();</span><br></pre></td></tr></table></figure>
+<h2 id="Example（示例）">Example（示例）</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> low = <span class="built_in">require</span>(<span class="string">'lowdb'</span>)</span><br><span class="line"><span class="keyword">var</span> db = low(<span class="string">'db.json'</span>)</span><br><span class="line"></span><br><span class="line">db(<span class="string">'posts'</span>).push(&#123; title: <span class="string">'lowdb is awesome'</span>&#125;)</span><br></pre></td></tr></table></figure>
+<p>数据库被<strong>自动</strong>存往<code>db.json</code></p>
+<p>Database is <strong>automatically</strong> saved to <code>db.json</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"posts"</span>: [</span><br><span class="line">    &#123; <span class="string">"title"</span>: <span class="string">"lowdb is awesome"</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你能使用任何<a href="https://lodash.com/docs" target="_blank" rel="external">lodash</a>方法来查询和操纵数据库</p>
+<p>You can query and manipulate it using <strong>any</strong> <a href="https://lodash.com/docs" target="_blank" rel="external">lodash</a> <strong>method</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'posts'</span>).find(&#123; title: <span class="string">'lowdb is awesome'</span> &#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="Install（安装）">Install（安装）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install lowdb --save</span><br></pre></td></tr></table></figure>
+<h2 id="Features（特性）">Features（特性）</h2><ul>
+<li>Small（轻量级）</li>
+<li>Serverless（不需要服务器）</li>
+<li>lodash rich API（lodash丰富的API）</li>
+<li>In-memory or disk-based（基于内存和硬盘的存储）</li>
+<li><strong>Hackable</strong> (mixins, id, encryption, …)</li>
+</ul>
+<p>lowDB非常容易学习，因为它只有八种方法和属性</p>
+<p>It’s also <strong>very easy to learn and use</strong> since it has <strong>only 8 methods and properties</strong>.</p>
+<p><a href="https://github.com/typicode/json-server" target="_blank" rel="external">json-server</a> 、<br><a href="http://jsonplaceholder.typicode.com/" target="_blank" rel="external">jsonplaceholder</a> 和 <a href="https://www.npmjs.com/browse/depended/lowdb" target="_blank" rel="external">other projects</a>都由lowDB强力驱动</p>
+<p><em>lowdb powers <a href="https://github.com/typicode/json-server" target="_blank" rel="external">json-server</a> package, <a href="http://jsonplaceholder.typicode.com/" target="_blank" rel="external">jsonplaceholder</a> website and <a href="https://www.npmjs.com/browse/depended/lowdb" target="_blank" rel="external">other projects</a>.</em></p>
+<h2 id="API">API</h2><p><strong>low([filename, options])</strong></p>
+<p>创建一个基于硬盘或者内存的数据库实例。如果文件名参数存在，那么这个文件就会被载入或者创建。</p>
+<p>Creates a disk-based or in-memory database instance. If a filename is provided, it loads or creates it.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> db = low()          <span class="comment">// in-memory</span></span><br><span class="line"><span class="keyword">var</span> db = low(<span class="string">'db.json'</span>) <span class="comment">// disk-based</span></span><br></pre></td></tr></table></figure>
+<p>当提供了<code>filename</code>参数时，你能设置选项</p>
+<p>When a filename is provided you can set options.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> db = low(<span class="string">'db.json'</span>, &#123;</span><br><span class="line">  autosave: <span class="literal">true</span>, <span class="comment">// automatically save database on change (default: true)</span></span><br><span class="line">  <span class="keyword">async</span>: <span class="literal">true</span>     <span class="comment">// asynchronous write (default: true)</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><strong>low.stringify(obj)</strong> and <strong>low.parse(str)</strong></p>
+<p>重写这些选项来自定义JSON的字符串化和解析</p>
+<p>Overwrite these methods to customize JSON stringifying and parsing.</p>
+<p><strong> db._ </strong></p>
+<p>数据库lodash实例，你能用它来添加你需要的实用功能或者第三方库</p>
+<p>Database lodash instance. Use it for example to add your own utility functions or third-party libraries.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">db._.mixin(&#123;</span><br><span class="line">  second: <span class="function"><span class="keyword">function</span>(<span class="params">array</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> array[<span class="number">1</span>]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> song1 = db(<span class="string">'songs'</span>).first()</span><br><span class="line"><span class="keyword">var</span> song2 = db(<span class="string">'songs'</span>).second()</span><br></pre></td></tr></table></figure>
+<p><strong>db.object</strong></p>
+<p>用以操纵底层数据库对象</p>
+<p>Use whenever you want to access or modify the underlying database object.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (db.object.songs) <span class="built_in">console</span>.log(<span class="string">'songs array exists'</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>db.save([filename])</strong></p>
+<p>保存数据库到指定文件</p>
+<p>Saves database to file.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> db = low(<span class="string">'db.json'</span>)</span><br><span class="line">db.save() <span class="comment">// saves to db.json</span></span><br><span class="line">db.save(<span class="string">'copy.json'</span>)</span><br></pre></td></tr></table></figure>
+<p>注意：如果你直接操纵了数据库对象，你需要手动调用<code>save</code>来保存</p>
+<p>Note: In case you directly modify the content of the database object, you’ll need to manually call <code>save</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> db.object.songs</span><br><span class="line">db.save()</span><br></pre></td></tr></table></figure>
+<p><strong>db.saveSync([filename])</strong></p>
+<p><code>db.save()</code>的同步执行版本<br>Synchronous version of <code>db.save()</code></p>
+<h2 id="Guide（指南）">Guide（指南）</h2><h3 id="Operations（操作）">Operations（操作）</h3><p>你可以在LowDB上使用所有的<a href="http://lodash.com/" target="_blank" rel="external">lodash API</a>，所以有很多方式查询操纵数据，下面是几个入门级示例</p>
+<p>With LowDB you get access to the entire <a href="http://lodash.com/" target="_blank" rel="external">lodash API</a>, so there’s many ways to query and manipulate data. Here are a few examples to get you started.</p>
+<p>请一定到牢记数据是由参考返回的【？】，这意味着对返回的对象的操作可能会导致数据库的改变，可以使用<code>.cloneDeep()</code>来避免这种状况。</p>
+<p>Please note that data is returned by reference, this means that modifications to returned objects may change the database. To avoid such behaviour, you need to use <code>.cloneDeep()</code>.</p>
+<p>当然，链式方法的执行是惰性的，也是说，<code>value()</code>调用后语句才会执行。</p>
+<p>Also, the execution of chained methods is lazy, that is, execution is deferred until <code>.value()</code> is called.</p>
+<p>排序挑选出前五首歌</p>
+<p>Sort the top five songs.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'songs'</span>)</span><br><span class="line">  .chain()</span><br><span class="line">  .where(&#123;published: <span class="literal">true</span>&#125;)</span><br><span class="line">  .sortBy(<span class="string">'views'</span>)</span><br><span class="line">  .take(<span class="number">5</span>)</span><br><span class="line">  .value()</span><br></pre></td></tr></table></figure>
+<p>检索歌曲标题</p>
+<p>Retrieve song titles.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'songs'</span>).pluck(<span class="string">'titles'</span>)</span><br></pre></td></tr></table></figure>
+<p>获取歌曲数量</p>
+<p>Get the number of songs.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'songs'</span>).size()</span><br></pre></td></tr></table></figure>
+<p>对<code>songs</code>数据库进行深度克隆</p>
+<p>Make a deep clone of songs.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'songs'</span>).cloneDeep()</span><br></pre></td></tr></table></figure>
+<p>更新一首歌的数据</p>
+<p>Update a song.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'songs'</span>)</span><br><span class="line">  .chain()</span><br><span class="line">  .find(&#123; title: <span class="string">'low!'</span> &#125;)</span><br><span class="line">  .assign(&#123; title: <span class="string">'hi!'</span>&#125;)</span><br><span class="line">  .value()</span><br></pre></td></tr></table></figure>
+<p>移除歌曲</p>
+<p>Remove songs.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db(<span class="string">'songs'</span>).remove(&#123; title: <span class="string">'low!'</span> &#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="Id_support（支持ID）">Id support（支持ID）</h3><p>通过ID来检索数据是非常有用的，特别是在服务器中。为了给LowDB添加基于ID的资源管理支持，你有两个选项。</p>
+<p>Being able to retrieve data using an id can be quite useful, particularly in servers. To add id-based resources support to lowdb, you have 2 options.</p>
+<p><a href="https://github.com/typicode/underscore-db" target="_blank" rel="external">underscore-db</a>为创建和操作基于ID的资源提供了一系列辅助</p>
+<p><a href="https://github.com/typicode/underscore-db" target="_blank" rel="external">underscore-db</a> provides a set of helpers for creating and manipulating id-based resources.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> db = low(<span class="string">'db.json'</span>)</span><br><span class="line"></span><br><span class="line">db._.mixin(<span class="built_in">require</span>(<span class="string">'underscore-db'</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> songId = db(<span class="string">'songs'</span>).insert(&#123; title: <span class="string">'low!'</span> &#125;).id</span><br><span class="line"><span class="keyword">var</span> song   = db(<span class="string">'songs'</span>).getById(songId)</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/broofa/node-uuid" target="_blank" rel="external">uuid</a> 返回一个独一无二的id</p>
+<p><a href="https://github.com/broofa/node-uuid" target="_blank" rel="external">uuid</a> returns a unique id.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> uuid = <span class="built_in">require</span>(<span class="string">'uuid'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> songId = db(<span class="string">'songs'</span>).push(&#123; id: uuid(), title: <span class="string">'low!'</span> &#125;).id</span><br><span class="line"><span class="keyword">var</span> song   = db(<span class="string">'songs'</span>).find(&#123; id: songId &#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="Encryption_support（加密支持）">Encryption support（加密支持）</h3><p>在某些情况下，你可能希望让别人难以解读数据库中的内容。你能通过重写<code>low.stringify</code> 和<code>low.parse</code>来添加自定义加密方法。</p>
+<p>In some cases, you may want to make it harder to read database content. By overwriting, <code>low.stringify</code> and <code>low.parse</code>, you can add custom encryption.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> crypto = <span class="built_in">require</span>(<span class="string">'crypto'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> cipher = crypto.createCipher(<span class="string">'aes256'</span>, secretKey)</span><br><span class="line"><span class="keyword">var</span> decipher = crypto.createDecipher(<span class="string">'aes256'</span>, secretKey)</span><br><span class="line"></span><br><span class="line">low.stringify = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = <span class="built_in">JSON</span>.stringify(obj)</span><br><span class="line">  <span class="keyword">return</span> cipher.update(str, <span class="string">'utf8'</span>, <span class="string">'hex'</span>) + cipher.final(<span class="string">'hex'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">low.parse = <span class="function"><span class="keyword">function</span>(<span class="params">encrypted</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> str = decipher.update(encrypted, <span class="string">'hex'</span>, <span class="string">'utf8'</span>) + decipher.final(<span class="string">'utf8'</span>)</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">JSON</span>.parse(str)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
         
       </div>
     
@@ -174,20 +258,16 @@
         
           <div class="post-tags">
             
-              <a href="/tags/casper-js/">
-                #casper.js
+              <a href="/tags/LowDB/">
+                #LowDB
               </a>
             
-              <a href="/tags/javascript/">
-                #javascript
+              <a href="/tags/node-js/">
+                #node.js
               </a>
             
-              <a href="/tags/微博/">
-                #微博
-              </a>
-            
-              <a href="/tags/爬虫/">
-                #爬虫
+              <a href="/tags/静态数据库/">
+                #静态数据库
               </a>
             
           </div>
@@ -197,13 +277,11 @@
           <div class="post-nav">
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2015/06/04/casper-js批量抓取信息demo/">casper.js批量抓取信息demo</a>
-              
             </div>
 
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2015/06/04/casper-js小基础/">casper.js小基础</a>
+                <a href="/2015/07/02/天黑都拍糊了/">天黑都拍糊了</a>
               
             </div>
           </div>
@@ -296,7 +374,7 @@
         <div class="post-toc">
           
           
-            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#采用casper-js进行的微博登陆"><span class="nav-number">1.</span> <span class="nav-text">采用casper.js进行的微博登陆</span></a></li></ol></div>
+            <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LowDB"><span class="nav-number">1.</span> <span class="nav-text">LowDB  </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Example（示例）"><span class="nav-number">1.1.</span> <span class="nav-text">Example（示例）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Install（安装）"><span class="nav-number">1.2.</span> <span class="nav-text">Install（安装）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Features（特性）"><span class="nav-number">1.3.</span> <span class="nav-text">Features（特性）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API"><span class="nav-number">1.4.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Guide（指南）"><span class="nav-number">1.5.</span> <span class="nav-text">Guide（指南）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Operations（操作）"><span class="nav-number">1.5.1.</span> <span class="nav-text">Operations（操作）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Id_support（支持ID）"><span class="nav-number">1.5.2.</span> <span class="nav-text">Id support（支持ID）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Encryption_support（加密支持）"><span class="nav-number">1.5.3.</span> <span class="nav-text">Encryption support（加密支持）</span></a></li></ol></li></ol></li></ol></div>
           
         </div>
         <div class="post-toc-indicator-bottom post-toc-indicator"></div>
