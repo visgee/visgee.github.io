@@ -1,0 +1,287 @@
+body {
+    background-color: #000;
+    font-family: 'PT Sans', 'Verdana','Open Sans', sans-serif;
+    margin: 0;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+.container{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+.header > div{
+    border-bottom: 1px solid rgba(0,250,250,0.7) ;
+
+}
+.pure-menu-heading{
+    color:rgba(255,255,255,0.8)
+}
+.pure-menu-selected .pure-menu-link, .pure-menu-selected .pure-menu-link:visited {
+    color: rgba(255,255,255,0.6) ;
+}
+.pure-menu-link {
+    color: rgba(255,255,255,0.6) ;
+}
+.pure-menu-active>.pure-menu-link, .pure-menu-link:hover, .pure-menu-link:focus {
+    background-color: rgba(0,250,250,0.7);
+    color:rgba(0,0,0,1)
+}
+
+.leftPanel{
+    width: 20%;
+    position: absolute;
+    left: 3%;
+    top: 20%;
+}
+.leftPanel .pure-g{
+    cursor: pointer;
+}
+.leftPanel .pure-u-4-5:hover{
+    color: rgba(0,250,250,0.7);
+}
+/**
+* Checkbox Four
+
+
+*/
+input[type=checkbox] {
+    visibility: hidden;
+}
+.checkboxFour {
+    width: 23px;
+    height: 23px;
+    border-radius: 100%;
+    position: relative;
+    border: 1px solid rgba(0,250,250,0.7);
+}
+
+/**
+ * Create the checkbox button
+ */
+.checkboxFour label {
+    display: block;
+    width: 11px;
+    height: 11px;
+    border-radius: 100px;
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -o-transition: all .2s ease;
+    -ms-transition: all .2s ease;
+    transition: all .2s ease;
+    cursor: pointer;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 1;
+    background: transparent;
+}
+
+/**
+ * Create the checked state
+ */
+.checkboxFour input[type=checkbox]:checked + label {
+    background: rgba(0,250,250,0.7);
+}
+
+
+.leftPanel .pure-u-4-5{
+    color: white;
+    line-height: 1.6;
+}
+.leftPanel .pure-g{
+    margin-top: 5%;
+}
+
+
+.rightPanel{
+    position: absolute;
+    top:20%;
+    right: 2%;
+    width: 25%;
+    height: 60%;
+    /*border: 1px solid rgba(0,250,250,0.7);*/
+}
+
+
+#svgBorder{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+#svgBorder line,#svgBorder polyline,#svgBorder polygon{
+    stroke-width:2
+}
+
+.listBox{
+    width: 70%;
+    margin: 15% auto 0;
+    overflow: auto;
+    height: 75%;
+}
+.listBox ul{
+    margin: 0;
+    padding: 0;
+}
+.listBox ul li{
+    list-style-type:none;
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    text-align: center;
+    cursor: pointer;
+
+}
+.listBox ul li:hover{
+    color: rgba(0,250,250,0.7);
+}
+
+
+
+::-webkit-scrollbar,scrollbar {
+    width: 5px;
+}
+::-webkit-scrollbar-thumb,scrollbar-thumb {
+    background-color: rgba(0,250,250,0.4);
+    /* border: solid 1px #C0C0C0; */
+    border-radius: 4px;
+}
+.countryName{
+    position: absolute;
+    width: 25%;
+    right: 4%;
+    bottom: 8%;
+    color: rgba(0,250,250,0.7);
+    font-size: 20px;
+    text-align: right;
+}
+
+.hide{
+    display: none;
+}
+
+
+
+.animated {
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+
+@-webkit-keyframes slideInLeft {
+    from {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+
+
+.slideInLeft {
+    -webkit-animation-name: slideInLeft;
+    animation-name: slideInLeft;
+}
+
+@-webkit-keyframes slideInRight {
+    from {
+        -webkit-transform: translate3d(100%, 0, 0);
+        transform: translate3d(100%, 0, 0);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        -webkit-transform: translate3d(100%, 0, 0);
+        transform: translate3d(100%, 0, 0);
+        visibility: visible;
+    }
+
+    100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.slideInRight {
+    -webkit-animation-name: slideInRight;
+    animation-name: slideInRight;
+}
+
+@-webkit-keyframes slideInRL {
+    from {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        -webkit-transform: translate3d(100%, 0, 0);
+        transform: translate3d(100%, 0, 0);
+    }
+    100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes slideInRL {
+    from {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+
+    50% {
+        -webkit-transform: translate3d(100%, 0, 0);
+        transform: translate3d(100%, 0, 0);
+    }
+    100% {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.slideInRL {
+    -webkit-animation-name: slideInRL;
+    animation-name: slideInRL;
+}
+
+
+.loader {
+    position: absolute;
+    width: 100%;
+    top:50%;
+    text-align: center;
+    font-size: 20px;
+    color: rgba(0,250,250,0.7);
+}

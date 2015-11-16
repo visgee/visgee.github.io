@@ -1,220 +1,190 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Country Selector</title>
-    <style>
-        body {
-            background-color: #000;
-            font-family: 'PT Sans', 'Verdana','Open Sans', sans-serif;
-            margin: 0;
-            overflow: hidden;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -o-user-select: none;
-            user-select: none;
-        }
+    <link rel="stylesheet" href="./css/pure.css">
 
-        h2 {
-            font-size: 1.1em;
-            color: #ff0;
-            margin: 0;
-            margin-bottom: 0px;
-            margin-top: 8px;
-        }
-
-        #title {
-            position: absolute;
-            left: 0px;
-            width: 100%;
-            top: 8px;
-            text-align: center;
-            z-index: 10;
-            font-size: 2.0em;
-            color: #0f0;
-            pointer-events: none;
-        }
-
-        #overlay {
-            position: absolute;
-            left: 0px;
-            width: 100%;
-            bottom: 0px;
-            height: 40px;
-            background: rgba(200,200,200,0.1);
-            text-align: center;
-            z-index: 10;
-            font-size: 2.0em;
-            color: #ff0;
-            pointer-events: none;
-        }
-    </style>
-    <script type="text/javascript" src="./js/three.js"></script>
-    <script type="text/javascript" src="./js/detect.js"></script>
-    <script type="text/javascript" src="./js/stats.js"></script>
-    <script type="text/javascript" src="./js/trackball.js"></script>
-    <script type="text/javascript" src="./js/projector.js"></script>
-    <script type="text/javascript" src="./js/tessalator3d.js"></script>
-    <script type="text/javascript" src="./data/country_data.js"></script>
-    <script>
-        var camera, scene, renderer, controls, stats;
-        var radius = 0.995;
-        var base_globe = 0;
-
-        var intersected_object = 0;
-        var overlay_element = 0;
-        var hover_scale = 1.01;
-
-        function start_app() {
-            init();
-            animate();
-        }
-
-        function init() {
-            if (!Detector.webgl) {
-                Detector.addGetWebGLMessage();
-            }
-
-            renderer = new THREE.WebGLRenderer();
-            renderer.setClearColor(0x000000, 0.0);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            scene = new THREE.Scene();
-
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 4500);
-            camera.position.z = 100;
-
-            scene.add(new THREE.AmbientLight(0x555555));
-
-            var directionalLight1 = new THREE.DirectionalLight(0xaaaaaa, 0.5);
-            directionalLight1.position.set(-1, 1, 1).normalize();
-            scene.add(directionalLight1);
-
-            var directionalLight2 = new THREE.DirectionalLight(0xaaaaaa, 0.5);
-            directionalLight2.position.set(-1, 1, -1).normalize();
-            scene.add(directionalLight2);
-
-            var directionalLight3 = new THREE.DirectionalLight(0xaaaaaa, 0.5);
-            directionalLight3.position.set(1, 1, -1).normalize();
-            scene.add(directionalLight3);
-
-            var directionalLight4 = new THREE.DirectionalLight(0xaaaaaa, 0.5);
-            directionalLight4.position.set(1, 1, 1).normalize();
-            scene.add(directionalLight4);
-
-            var segments = 64;
-
-            base_globe = new THREE.Object3D();
-            base_globe.scale.set(20, 20, 20);
-            scene.add(base_globe);
-
-            sea_texture = THREE.ImageUtils.loadTexture('./assets/sea.jpg', THREE.UVMapping, function () {
-                sea_texture.wrapS = THREE.RepeatWrapping;
-                sea_texture.wrapT = THREE.RepeatWrapping;
-                sea_texture.repeat.set(16, 8);
-                base_globe.add(new THREE.Mesh(
-                        new THREE.SphereGeometry(radius, segments, segments),
-                        new THREE.MeshLambertMaterial({
-                            transparent: true,
-                            depthTest: true,
-                            depthWrite: false,
-                            opacity: 0.95,
-                            map: sea_texture,
-                            color: 0x6699ff
-                        })));
-
-                for (var name in country_data) {
-                    geometry = new Tessalator3D(country_data[name], 0);
-
-                    var continents = ["EU", "AN", "AS", "OC", "SA", "AF", "NA"];
-                    var color = new THREE.Color(0xff0000);
-                    color.setHSL(continents.indexOf(country_data[name].data.cont) * (1 / 7), Math.random() * 0.25 + 0.65, Math.random() / 2 + 0.25);
-                    var mesh = country_data[name].mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
-                        color: color
-                    }));
-                    mesh.name = "land";
-                    mesh.userData.country = name;
-                    base_globe.add(mesh);
-                }
-            });
-
-            controls = new THREE.TrackballControls(camera, renderer.domElement);
-            controls.rotateSpeed = 2.0;
-            controls.zoomSpeed = 1.0;
-            controls.noZoom = false;
-            controls.noPan = true;
-            controls.staticMoving = false;
-            controls.minDistance = 23.0;
-            controls.maxDistance = 70.0;
-            controls.dynamicDampingFactor = 0.1;
-
-            stats = new Stats();
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.top = '0px';
-            document.body.appendChild(stats.domElement);
-
-            window.addEventListener('resize', onWindowResize, false);
-            document.addEventListener('mousemove', onDocumentMouseMove, false);
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function onDocumentMouseMove(event) {
-            if (intersected_object !== 0) {
-                intersected_object.scale.set(1.0, 1.0, 1.0);
-            }
-
-            event.preventDefault();
-            var mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            var mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-            var vector = new THREE.Vector3(mouseX, mouseY, -1);
-            vector.unproject(camera);
-            var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-            var intersects = raycaster.intersectObject(base_globe, true);
-            if (intersects.length > 0) {
-                if (intersects[0].point !== null) {
-                    if (intersects[0].object.name === "land") {
-                        console.log(intersects[0].object.userData.country);
-
-                        if (overlay_element === 0) {
-                            overlay_element = document.getElementById("overlay");
-                        }
-                        overlay_element.innerHTML = intersects[0].object.userData.country;
-
-                        intersects[0].object.scale.set(hover_scale, hover_scale, hover_scale);
-                        intersected_object = intersects[0].object;
-                    } else {
-                        overlay_element.innerHTML = "";
-                    }
-                } else {
-                    overlay_element.innerHTML = "";
-                }
-            } else {
-                overlay_element.innerHTML = "";
-            }
-        }
-
-        function animate(time) {
-            requestAnimationFrame(animate);
-            controls.update();
-            stats.update();
-            renderer.render(scene, camera);
-        }
-    </script>
-
+    <link rel="stylesheet" href="./css/custom.css">
 </head>
 <body>
+<div class="header">
+    <div class="menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">全球数据库</a>
 
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item "><a href="#" class="pure-menu-link">A</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">B</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">C</a></li>
+        </ul>
+    </div>
+</div>
+<div class="container">
+    <div id="earth">
+
+    </div>
+    <div class="leftPanel hide animated">
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="03" checked="true" class="activeCheckBox" id="checkbox1" name="">
+                    <label for="checkbox1"></label>
+                </div>
+            </div>
+            <div class="pure-u-4-5">
+                明确合作
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="05" checked="false" id="checkbox2" name="">
+                    <label for="checkbox2"></label>
+                </div>
+
+            </div>
+            <div class="pure-u-4-5">
+                进行外交合作
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="06" checked="false" id="checkbox3" name="">
+                    <label for="checkbox3"></label>
+                </div>
+
+            </div>
+            <div class="pure-u-4-5">
+                实际合作
+
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="07" checked="false" id="checkbox4" name="">
+                    <label for="checkbox4"></label>
+                </div>
+            </div>
+            <div class="pure-u-4-5">
+                提供紧急救援
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="13" checked="false" id="checkbox5" name="">
+                    <label for="checkbox5"></label>
+                </div>
+            </div>
+            <div class="pure-u-4-5">
+                威胁
+
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="14" checked="false" id="checkbox6" name="">
+                    <label for="checkbox6"></label>
+                </div>
+            </div>
+            <div class="pure-u-4-5">
+                抗议
+
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="15" checked="false" id="checkbox7" name="">
+                    <label for="checkbox7"></label>
+                </div>
+            </div>
+            <div class="pure-u-4-5">
+                军演
+
+            </div>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-5">
+                <div class="checkboxFour">
+                    <input  type="checkbox" value="19" checked="false" id="checkbox8" name="">
+                    <label for="checkbox8"></label>
+                </div>
+            </div>
+            <div class="pure-u-4-5">
+                战争
+
+            </div>
+        </div>
+
+    </div>
+    <div class="rightPanel hide  animated">
+        <svg version="1.1" id="svgBorder"  x="0px" y="0px" preserveAspectRatio="none"
+             viewBox="0 0 1000 1500" enable-background="new 0 0 1000 1500" xml:space="preserve">
+            <g>
+                <polyline fill="none" stroke="#00ffff" stroke-miterlimit="10" points="776.5,1449.9 31.6,1449.9 31.6,178.6 	"/>
+                <polyline fill="none" stroke="#00ffff" stroke-miterlimit="10" points="192.5,29.5 951.3,29.5 951.3,1290.1 	"/>
+                <line fill="none" stroke="#00ffff" stroke-miterlimit="10" x1="192.5" y1="29.5" x2="31.6" y2="178.6"/>
+                <line fill="none" stroke="#00ffff" stroke-miterlimit="10" x1="951.3" y1="1290.1" x2="776.5" y2="1449.9"/>
+            </g>
+            <g>
+                <polyline fill="none" stroke="#00ffff" stroke-miterlimit="10" points="765.1,1433.3 50.6,1433.3 50.6,190.3 	"/>
+                <polyline fill="none" stroke="#00ffff" stroke-miterlimit="10" points="204.9,44.5 339.6,44.5 401,80 731,80 791.1,44.5 
+                    932.8,44.5 932.8,1277 	"/>
+                <line fill="none" stroke="#00ffff" stroke-miterlimit="10" x1="204.9" y1="44.5" x2="50.6" y2="190.3"/>
+                <line fill="none" stroke="#00ffff" stroke-miterlimit="10" x1="932.8" y1="1277" x2="765.1" y2="1433.3"/>
+            </g>
+            <polygon fill="none" stroke="#00ffff" stroke-miterlimit="10" points="155.9,30 31.8,141.1 32,97.4 111.9,30 "/>
+        </svg>
+
+
+    </div>
+    <div class="rightPanel hide animated">
+        <div class="listBox">
+            <ul>
+
+            </ul>
+        </div>
+
+    </div>
+    <div class="countryName">
+
+    </div>
+    <div class="loader">
+        载入中
+    </div>
+
+
+
+</div>
+
+
+
+<audio id="bi" class="sound"   src="./assets/sound1.mp3">
+</audio>
+<audio id="shua" class="sound" src="./assets/sound4.mp3">
+</audio>
+
+
+<script src="./js/jquery.js"></script>
+<script src="./js/jquery.easing.js"></script>
+<script src="./js/jquery.mousewheel.js"></script>
+<script src="./js/jquery.vaccordion.js"></script>
+<script src="./data/eventsData.js"></script>
+<script type="text/javascript" src="./js/three.js"></script>
+<script type="text/javascript" src="./js/detect.js"></script>
+<script type="text/javascript" src="./js/stats.js"></script>
+<script type="text/javascript" src="./js/trackball.js"></script>
+<script type="text/javascript" src="./js/projector.js"></script>
+<script type="text/javascript" src="./js/tessalator3d.js"></script>
+<script type="text/javascript" src="./data/country_data.js"></script>
+<script src="./js/app.js"></script>
 <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", start_app, false);
+    document.addEventListener("DOMContentLoaded", start_app, false);
+
 </script>
-<div id="title">Country Selector</div>
-<div id="overlay">Mouse over a country to see its name</div>
 </body>
 </html>

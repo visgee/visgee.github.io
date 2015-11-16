@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>三维数据可视化demo</title>
+    <style>
+    body{
+        margin: 0;
+        padding: 0;
+        background-color: black;
+    }
+  </style>
+</head>
+<body>
+
+<div id="threejs"></div>
+<script src="./js/jquery.js"></script>
+
+<script src="./js/three.js"></script>
+<script src="./js/trackball.js"></script>
+
+<script>
+    var scene,camera,renderer,controls;
+    var WIDTH = window.innerWidth;
+    var HEIGHT = window.innerHeight;
+    var sprites = [];
+    var origionalDis,currentDis;
+
+
+
+    init();
+    animate();
+
+    function init(){
+        scene = new THREE.Scene();
+        renderer = new THREE.WebGLRenderer({antialis: true});
+        renderer.setSize(WIDTH,HEIGHT);
+        renderer.setClearColor(0x333F47, 1);
+        document.getElementById('threejs').appendChild(renderer.domElement);
+
+        camera = new THREE.PerspectiveCamera(70, WIDTH / HEIGHT, 1, 10000);
+        camera.position.set(10,10,10);
+        camera.lookAt(scene.position);
+        origionalDis = dis(camera.position,scene.position);
+
+        scene.add(camera);
+
+        controls = new THREE.TrackballControls(camera);
+        controls.rotateSpeed = 3.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.noZoom = false;
+        controls.noPan = false;
+        controls.staticMoving = true;
+        controls.dynamicDampingFactor = 0.3;
+        controls.keys = [65,83,68];
+        controls.addEventListener('change',render);
+
+        var boxG = new THREE.BoxGeometry(4,4,4);
+        var boxM = new THREE.MeshBasicMaterial({color:0xff0000});
+        var box  =new THREE.Mesh(boxG, boxM);
+        scene.add(box);
+        box.position.set(0,0,0);
+
+
+
+        function createTextCanvas(text, color, font, size) {
+            size = size || 200;
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var fontStr = (size + 'px ') + (font || 'Arial');
+            ctx.font = fontStr;
+            var w = ctx.measureText(text).width;
+            console.log(w);
+            var h = Math.ceil(size);
+            canvas.width =  w;
+            canvas.height = h;
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, 50, 100);
+            ctx.font = fontStr;
+            ctx.fillStyle = color || 'black';
+            ctx.fillText(text, 0, Math.ceil(size * 0.8));
+            return canvas;
+        }
+        var canvas2 = createTextCanvas('你好','white');
+        var texture2 = new THREE.Texture(canvas2);
+        texture2.needsUpdate = true;
+        var textures = [];
+
+        var va = box.geometry.vertices;
+        for(var i = 0; i<va.length;i++ ){
+            var _canvas = createTextCanvas(i+1 + '...','white');
+            var _texture = new THREE.Texture(_canvas)
+            _texture.needsUpdate = true;
+            textures.push(_texture);
+            var _material = new THREE.SpriteMaterial({
+                map: _texture
+            });
+            var _sprite = new THREE.Sprite(_material);
+            _sprite.position.set(va[i].x * 1.2,va[i].y * 1.2 ,va[i].z* 1.2  );
+            _sprite.scale.set(1,1,1)
+            sprites.push(_sprite)
+            scene.add(_sprite);
+        }
+
+
+
+        /////// draw text on canvas /////////
+
+        // create a canvas element
+        var canvas1 = document.createElement('canvas');
+        var context1 = canvas1.getContext('2d');
+
+        var message = 'dsdjfsjdfdskfjlks';
+        var metrics = context1.measureText(message);
+        var width = metrics.width;
+        console.log(width)
+        context1.fillStyle = "rgba(0,0,0,0.95)"; // black border
+        context1.fillRect( 0,0, width+8,20+8);
+        context1.fillStyle = "rgba(255,255,255,0.95)"; // white filler
+        context1.fillRect( 2,2, width+4,20+4 );
+        context1.font = "Bold 20px Arial";
+        context1.fillStyle = "rgba(0,0,0,1)"; // text color
+        context1.fillText( message, 4,20 );
+        // canvas contents will be used for a texture
+        var texture1 = new THREE.Texture(canvas1)
+        texture1.needsUpdate = true;
+
+        ////////////////////////////////////////
+
+        var spriteMaterial = new THREE.SpriteMaterial( {
+            map: texture2,
+            } );
+
+        sprite1 = new THREE.Sprite( spriteMaterial );
+        sprite1.scale.set(1,1,1);
+        sprite1.position.set( 2, 2, 2 );
+        //scene.add( sprite1 );
+    }
+    function animate(){
+        requestAnimationFrame(animate);
+        controls.update();
+        renderScene();
+    }
+    function renderScene(){
+        currentDis = dis(camera.position,scene.position);
+        var cz = currentDis / origionalDis;
+        for(var i = 0; i < sprites.length; i++){
+            sprites[i].scale.set(1 * cz,1 * cz,1 * cz )
+        }
+        renderer.render(scene, camera);
+    }
+    function render() {
+
+        renderer.render( scene, camera );
+
+    }
+
+    function dis(v1,v2){
+        var dx = v1.x - v2.x;
+        var dy = v1.y - v2.y;
+        var dz = v1.z - v2.z;
+        return Math.sqrt(dx * dx + dy*dy+dz*dz);
+    }
+
+    
+
+
+</script>
+</body>
+</html>

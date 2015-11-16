@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>china food</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background: rgb(29,34,40);
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="container"></div>
+<script src="./js/detect.js"></script>
+<script src="./js/jquery.js"></script>
+<script src="./js/three.js"></script>
+<script src="./js/trackball.js"></script>
+<script src="./js/dat.js"></script>
+<script src="./js/stats.js"></script>
+<script>
+    var scene,camera,renderer,controls;
+    var WIDTH = window.innerWidth;
+    var HEIGHT = window.innerHeight;
+
+
+    var mw = 4.09;
+    var mh = 3.37;
+    var zuinan = 20.07;
+    var zuixi = 73.66;
+
+    init();
+    animate();
+
+
+    function init(){
+        scene = new THREE.Scene();
+        renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setSize(WIDTH,HEIGHT);
+        //renderer.setClearColor();
+
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        camera = new THREE.PerspectiveCamera(70, WIDTH / HEIGHT, 1, 10000);
+        camera.position.set(0,-5,5);
+        camera.lookAt(scene.position);
+        scene.add(camera);
+
+
+        controls = new THREE.TrackballControls(camera);
+        controls.rotateSpeed = 3.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 0.8;
+        controls.noZoom = false;
+        controls.noPan = false;
+        controls.staticMoving = true;
+        controls.dynamicDampingFactor = 0.3;
+        controls.keys = [65,83,68];
+        controls.addEventListener('change',renderScene);
+
+        window.addEventListener( 'resize', onWindowResize, false )
+
+
+        var planeGeometry = new THREE.PlaneGeometry( mw, mh);
+        var planeMaterial = new THREE.MeshBasicMaterial( {
+            transparent:true,
+            opacity:0.7,
+            map : THREE.ImageUtils.loadTexture('./assets/chinaM.png'),
+            color: 0xffffff,
+            side: THREE.DoubleSide} );
+        var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+        //plane.position.set(iw / 2,ih / 2, 0);
+
+        scene.add(plane);
+
+        var boxMaterial= new THREE.MeshBasicMaterial({
+            color: 0xff0000
+        });
+        var boxGeometry = new THREE.BoxGeometry(0.1,0.1,2)
+        var box = new THREE.Mesh(boxGeometry,boxMaterial);
+        box.position.set(0,0,1);
+        scene.add(box);
+
+    }
+
+
+    function onWindowResize() {
+        windowHalfX = window.innerWidth / 2;
+        windowHalfY = window.innerHeight / 2;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    function animate() {
+
+        requestAnimationFrame(animate);
+        //下面这个一定要放在requestAnimationFrame的下面哦
+        controls.update();
+        renderScene();
+    }
+
+    function renderScene(){
+        renderer.render(scene, camera);
+    }
+</script>
+</body>
+</html>
